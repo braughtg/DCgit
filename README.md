@@ -52,7 +52,7 @@ The files in this repository are:
     * The date/time/user and the command being used are written to the log file in the local repository.
     * All of the changes to the local repository are committed using the date/time and local username as the commit message.
     * The local repository is pushed from the local machine to GitHub. 
-      * If there are merge conflicts the script terminates, a message is added to the log file and a suggestion is made that either a _DCgitPull_ be done to resolve the conflict or that the [ ForceLocal ] flag be used.
+      * If there are merge conflicts the script terminates, a message including date/time/user and the command is added to the log file and a suggestion is made that either a _DCgitPull_ be done to resolve the conflict or that the [ ForceLocal ] flag be used.
 
 * __DCgitSubmit__ _AssignmentName_
 
@@ -60,15 +60,18 @@ The files in this repository are:
     * asdf
     
   * Behavior:
-    * Converts the Draft Pull Request to one that is ready for review.
+    * asdf
     
 * __DCgitExpunge__ _AssignmentName_
 
   * Parameters:
-    * asdf
+    * _AssignmentName_ : The name of the repository in the course organization on GitHub.
     
   * Behavior:
-    * asdf
+    * If the student is in the indicated repository on the local machine, the repositiory is removed.
+      * Otherwise a message including the date/time/user and the command is added to the log file.
+    * If the local repository is removed, an attempt is made to remove the repository on GitHub.
+      * If the repository cannot be removed a message including the date/time/user and the command is added to the log file and a message indicating that the command must be run by the owner of the repository.
 
 _NOTE_: These scripts have been produced for the specific use cases invovled in our course.  They are not designed to handle every use case. Nor are they designed to prohibit sufficiently motivated and unethical students from working around the basic restrictions that they impose.  The code has been released under a Creative Commons Licence (see below) so please feel free to adapt to your purposes. Pull requests that handle additional use cases or improve the robustness of the scripts in a sufficently general way that does not impact our specific usecases are welcome and will be considered on a case-by-case basis.
 
