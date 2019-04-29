@@ -3,11 +3,12 @@ Scripts to be used by the students to get and submit assignments.
 
 The files in this repository are:
 * __DCgitSetup__
-  * Generates the configuration file used by these scripts and also configures git to know the user and their password.
-  * This script needs to be run once on each machine that the student uses.
+  * Run once on each machine the student uses to set common configuration parameters.
   
   * Behavior:
-    * asf;lksf
+    * Generates the configuration file used by these scripts.
+    * Configures git to know the username and password of the student.
+    * _NOTE_: All other scripts will check for the existence of the configuration file.  If it does not exist, a suggestion will be made to run _DCgitSetup_ prior to use of the other scripts.
     
 * __DCgitBegin__ _AssignmentName_ [ _PartnerGitHubID_ ]
   * Run once at the beginning of an assignment to produce an editable version of the assignment that is available to the student, and possibly a partner. 
