@@ -10,12 +10,16 @@ The files in this repository are:
   * Retrives content for an assignment (repository) from GitHub to the student's local machine.
     * This script should be run at the start of each work session.
   
-    * If the student is not in the requested repository on their local machine:
-      * The script first attempts to clone the repository from the student's GitHub.  If the repository does not exist on the student's GitHub and a partner is specified, the script then attempts to clone the repository from the partner's GitHub.  If the repository does not exist in the partner's GitHub, the script first forks the the repository from the course site to the student's GitHub, establish the partner (if specified) as a collaborator and the instructor(s) as collaborator(s) and then clones the repo to the local machine.
-      * _NOTE_: Each assignment is configured to be indiviudal or partnered in the course repository. For assignments configured to be individual, the script will terminate if a _PartnerGitHubID_ is specified.
+    * Parameters:
+      * _AssignmentName_ : The name of the repository in the course organization on GitHub.
+      * [_PartnerGitHubID_] : The GitHub username of the partner for a partnered assignment.
       
-    * If the student is in the requested repository on their local machine:
-      * Pull the contents of the repository from the origin (either their GitHub or their partner's GitHub).
+    * Behavior:
+      * If the student is not in the requested repository on their local machine:
+        * The script first attempts to clone the repository from the student's GitHub.  If the repository does not exist on the student's GitHub and a partner is specified, the script then attempts to clone the repository from the partner's GitHub.  If the repository does not exist in the partner's GitHub, the script first forks the the repository from the course organization to the student's GitHub, establish the partner (if specified) as a collaborator and the instructor(s) as collaborator(s) and then clones the repo to the local machine.
+        * _NOTE_: Each assignment is configured to be indiviudal or partnered in the course repository. For assignments configured to be individual, the script will terminate if a _PartnerGitHubID_ is specified.
+      * If the student is in the requested repository on their local machine:
+        * Pull the contents of the repository from the origin (either their GitHub or their partner's GitHub).
     
 * __COMP130Push__ _AssignmentName_ _GitHubUser_ [ force ]
   * Commits all changes to the local repository and push to the origin.
