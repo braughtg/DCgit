@@ -6,47 +6,52 @@ The files in this repository are:
   * Generates the configuration file used by these scripts and also configures git to know the user and their password.
   * This script needs to be run once on each machine that the student uses.
   
-* __DCgitBegin__ _AssignmentName_ [_PartnerGitHubID_] [ restart ]
-  * Makes an editable assignment available to a student by forking it from the course organization to the student's GitHub, and cloning it to the local machine.
+  * Behavior:
+    * asf;lksf
+    
+* __DCgitBegin__ _AssignmentName_ [ _PartnerGitHubID_ ]
+  * Run once at the beginning of an assignment to produce an editable version of the assignment that is available to the student, and possibly a partner. 
 
   * Parameters:
     * _AssignmentName_ : The name of the repository in the course organization on GitHub.
-    * [_PartnerGitHubID_] : The GitHub username of a partner for a partnered assignment.
-    * restart : Restarts the assignments by removing the repository from the student's GitHub and creating a fresh copy from the course organization.
+    * [ _PartnerGitHubID_ ] : The GitHub username of a partner for a partnered assignment.
       * _NOTE_: Each assignment is configured to be indiviudal or partnered in the course repository. For assignments configured to be individual, the script will terminate if a _PartnerGitHubID_ is specified.
       
    * Behavior:
-     * If the repository does not exist in the student's GitHub or the GitHub indicated by the _PartnerGitHubID_ it is forked from the course organization into the student's GitHub as a private repository.
+     * If the repository does not exist in the student's GitHub or the GitHub indicated by the _PartnerGitHubID_ it is copied from the course organization into the student's GitHub as a private repository.
      * If the assignment is partnered and a _PartnerGitHubID_ is specified, the partner will be established as a collaborator on the private repository.
-     * The private repository is cloned into the current directory on the local machine.
-
+     * The instructors for the course, as configured by running the _DCgitSetup_ script, are added as collaborators on the private repository.
     
-* __DCgitPull__ _AssignmentName_ [_PartnerGitHubID_]
-  * Retrives content for an assignment (repository) from GitHub to the student's local machine.
-  * This script should be run at the start of each work session.
+* __DCgitPull__ _AssignmentName_ [ _PartnerGitHubID_ ] [ ForceLocal | ForceRemote | Merge ]
+  * Run at the beginning of each work session to pull the editable version of the assignment down from GitHub to the student's local machine.
   
   * Parameters:
     * _AssignmentName_ : The name of the repository in the course organization on GitHub.
-    * [_PartnerGitHubID_] : The GitHub username of the partner for a partnered assignment.
+    * [ _PartnerGitHubID_ ] : The GitHub username of the partner for a partnered assignment.
+    * [ ForceLocal | ForceRemote | Merge ] : Force merge conflicts to be resolved in favor of the local version, in favor of the version currently on GitHub, or to launch a merge tool that will allow the conflicts to be resoved.
       
   * Behavior:
-    * If the student is not in the requested repository on their local machine:
-      * The script first attempts to clone the repository from the student's GitHub.  If the repository does not exist on the student's GitHub and a partner is specified, the script then attempts to clone the repository from the partner's GitHub.  If the repository does not exist in the partner's GitHub, the script first forks the the repository from the course organization to the student's GitHub, establish the partner (if specified) as a collaborator and the instructor(s) as collaborator(s) and then clones the repo to the local machine. 
-      * _NOTE_: Each assignment is configured to be indiviudal or partnered in the course repository. For assignments configured to be individual, the script will terminate if a _PartnerGitHubID_ is specified.
-    * If the student is in the requested repository on their local machine:
-      * Pull the contents of the repository from the origin (either their GitHub or their partner's GitHub).
-      * _NOTE_: 
-
-* __DCgitPush__ _AssignmentName_ [ force ]
-  * Commits all changes to the local repository and pushes to the origin.
-  * This script should be run at the end of each work session.
+    * If the student is not in the requested repository on the local machine:
+      * Attempt to clone the repository from the student's GitHub.  If the repository does not exist on the student's GitHub and a partner is specified, the script then attempt to clone the repository from the partner's GitHub.  If the repository does not exist in the partner's GitHub, the script fails and suggest that _DCgitBegin_ may need to be used if this is a new assignment.
+      * A log file is created in the local the repository and the date/time/user are written in as the creation message.
+      
+    * If the student is in the requested repository on the local machine:
+      * Pull the contents of the repository from the origin (either their GitHub or their partner's GitHub).  
+        * If there are merge conflicts the script will terminate with a message suggesting the use of one of the _[ ForceLocal | ForceRemote | Merge ]_ flags.
+      * The date/time/user, the command used and the results are added to the log file in the local repository.
+    
+* __DCgitPush__ _AssignmentName_ [ ForceLocal ]
+  * Run at the end of each work session to push the current version of the assignment from the student's local machine up to GitHub.
     
   * Parameters:
     * _AssignmentName_ : The name of the repository in the course organization on GitHub.
+    * [ ForceLocal ] : Forces the assignment on GitHub to look identical to the version on the local machine.
     
   * Behavior:
-    * All merge conflicts are forced to be resolved in favor of the local repository being pushed. 
-    * Generates a Draft Pull Request to the course repository
+    * The date/time/user and the command being used are written to the log file in the local repository.
+    * All of the changes to the local repository are committed using the date/time and local username as the commit message.
+    * The local repository is pushed from the local machine to GitHub. 
+      * If there are merge conflicts the script terminates, a message is added to the log file and a suggestion is made that either a _DCgitPull_ be done to resolve the conflict or that the [ ForceLocal ] flag be used.
 
 * __DCgitSubmit__ _AssignmentName_
 
