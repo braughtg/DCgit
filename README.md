@@ -67,9 +67,11 @@ The files in this repository are:
     * _AssignmentID_ : The identifier of the repository in the course organization on GitHub.
     * [ ForceLocal ] : Forces the assignment on GitHub to look identical to the version on the local machine.
     
+  * Error Conditions:
+    * If the confifguration file for the course does not exist the script terminates with a suggestion to check the _CourseID_ and to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If the repository does not exist locally or on GitHub the script fails and suggest that the _CourseID_ and _AssignmentID_ are checked.
+    
   * Behavior:
-    * If the repository does not exist locally or on GitHub:
-        * The script terminates with a suggestion to check the _CourseID_ and _AssignmentID_.
     * The date/time/user and the command being used are written to the log file in the local repository.
     * All of the changes to the local repository are committed using the date/time and local username as the commit message.
     * The local repository is pushed from the local machine to GitHub. 
