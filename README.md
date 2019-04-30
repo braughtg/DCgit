@@ -43,12 +43,16 @@ The files in this repository are:
     * [ _PartnerGitHubID_ ] : The GitHub username of the partner for a partnered assignment.
     * [ ForceLocal | ForceRemote | Merge ] : Force merge conflicts to be resolved in favor of the local version, in favor of the version currently on GitHub, or to launch a merge tool that will allow the conflicts to be resoved.
       
+  * Error Conditions:
+    * If the confifguration file for the course does not exist the script terminates with a suggestion to check the _CourseID_ and to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If the _PartnerGitHubID_ is specified and does not exist on GitHub then the script terminates with a suggestion to check the _PartnerGitHubID_.
+    * If the _PartnerGitHubID_ is specified but the assignment is an individual assignment then the script terminates with an indication that the assignment is not partnered and the _PartnerGitHubID_ should be omitted.
+    * If the repository does not exist in the student's GitHub or in the the partner's GitHub the script fails and suggest that the _AssignmentID_ and _PartnerGitHubID_ are checked and that _DCgitBegin_ may need to be used if this is a new assignment.
+  
   * Behavior:
     * If the repository for the assignment does not exist on the local machine:
-      * Attempt to clone the repository from the student's GitHub.  
-        * If the repository does not exist on the student's GitHub and a partner is specified, the script then attempt to clone the repository from the partner's GitHub.
-        * If the repository does not exist in the partner's GitHub, the script fails and suggest that _DCgitBegin_ may need to be used if this is a new assignment.
-      * If successful, a log file is created in the local the repository and the date/time/user are written in as the creation message.
+      * Clone the repository from the student's GitHub.  
+      * A log file is created in the local the repository and the date/time/user are written in as the creation message.
       
     * If the repository for the assignment exists on the local machine:
       * Pull the contents of the repository from the origin (either their GitHub or their partner's GitHub).  
