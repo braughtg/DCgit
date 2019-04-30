@@ -38,46 +38,48 @@ Below are the details on each of the files in repository.
   * Parameters:
     * _AssignmentID_ : The identifier of the repository in the course organization on GitHub.
     * [ _PartnerGitHubID_ ] : The GitHub username of a partner for a partnered assignment.
-      * _NOTE_: Each assignment is configured to be indiviudal or partnered in the course repository. For assignments configured to be individual, the script will terminate if a _PartnerGitHubID_ is specified.
+      * _NOTE_: Each assignment is configured to be indiviudal or partnered in the course repository.
       
    * Error Conditions:
      * If the confifguration file for the course does not exist or has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
-     * If the _PartnerGitHubID_ is specified and does not exist on GitHub then the script terminates with a suggestion to check the _PartnerGitHubID_.
-     * If the _PartnerGitHubID_ is specified but the assignment is an individual assignment then the script terminates with an indication that the assignment is not partnered and the _PartnerGitHubID_ should be omitted.
-     * If the repository already exists in the student's GitHub, the partner's GitHub and/or on the local machine then the script terminates indicating that the assignment already exists and that _DCgitPull_ may be the intended action. 
      * If the repository does not exist in the course organization the script terminates with a suggestion to check the _AssignmentID_.
-     
+     * If the _PartnerGitHubID_ is specified but the assignment is an individual assignment then the script terminates with an indication that the assignment is not partnered and the _PartnerGitHubID_ should be omitted.
+     * If the _PartnerGitHubID_ is specified and does not exist on GitHub then the script terminates with a suggestion to check the _PartnerGitHubID_.
+     * If the repository already exists in the student's GitHub or the partner's GitHub then the script terminates indicating that the assignment already exists and that _DCgitPull_ may be the intended action. 
+
    * Behavior:
      * The repository is copied from the course organization into the student's GitHub as a private repository.
-       * _NOTE:_ The repository is copied rather than being forked because it will be a private repositiory in the student's GitHub
+       * _NOTE:_ The repository is copied rather than being forked because it will be private.
      * If a _PartnerGitHubID_ is specified, the partner will be established as a collaborator on the private repository.
      * The instructor(s) for the course are added as collaborators on the private repository.
      * The repository for the assignment is cloned to the student's local machine.
-     * If a _PartnerGitHubID_ is specified the partner's origin is also setup as a remote.
+     * If a _PartnerGitHubID_ is specified the partner's origin is also setup as a remote for the local repository.
+       * _NOTE:_ This is becasue partnered projects will be pushed to both partner anytime either pushes.
     
 * __DCgitPull__ [ ForceLocal | ForceRemote | Merge ]
-  * Run within the assignment repository at the beginning of each work session to pull the editable version of the assignment down from GitHub to the student's local machine.
+  * Run within the assignment repository at the beginning of each work session to pull the most recent version of the assignment down from GitHub to the student's local machine.
   
   * Parameters:
-    * [ ForceLocal | ForceRemote | Merge ] : Force merge conflicts to be resolved in favor of the local version, in favor of the version currently on GitHub, or to launch a merge tool that will allow the conflicts to be resoved.
+    * [ ForceLocal | ForceRemote | ForcePartner | Merge ] : Force merge conflicts to be resolved in favor of the local version, the version on the student's GitHub, the version on the partner's GitHub, or to launch a merge tool that will allow the conflicts to be resoved.
       
   * Error Conditions:
     * If the confifguration file for the course does not exist or has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
-    * If the origin repository does not exist on GitHub the script fails, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
+    * If the origin repository does not exist on GitHub the script terminates, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
+    * If ForcePartner is used and the assignment is not paired the script terminates with a message stating that the assignment is not paired.
   
   * Behavior:
-    * Pull the contents of the repository from the origin.  
-      * If there are merge conflicts the script will terminate with a message suggesting the use of one of the _[ ForceLocal | ForceRemote | Merge ]_ flags.
+    * Pull the contents of the repository from the appropriate remote.
+      * If there are merge conflicts the script will terminate with a message suggesting the use of one of the _[ ForceLocal | ForceRemote | ForcePartner | Merge ]_ flags.
     
 * __DCgitPush__ [ ForceLocal ]
-  * Run within the assignment repository at the end of each work session to push the current version of the assignment from the student's local machine up to GitHub both in the student's GitHub and the partner's if the assignment is paired.
+  * Run within the assignment repository at the end of each work session to push the current version of the assignment from the student's local machine up to GitHub. It is pushed to both the student's GitHub and the partner's GitHub if the assignment is paired.
     
   * Parameters:
-    * [ ForceLocal ] : Forces the repository on GitHub to look identical to the version on the local machine.
+    * [ ForceLocal ] : Forces the repository(ies) on GitHub to look identical to the version on the local machine.
     
   * Error Conditions:
     * If the confifguration file for the course does not exist or has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
-    * If all remote repositories (origin plus the partners if it is a partnered assignment) do not exist on GitHub the script fails, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
+    * If any remote repositories (origin plus the partners if it is a partnered assignment) do not exist on GitHub the script fails, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
     
   * Behavior:
     * All of the changes to the local repository are committed using the date/time and local username as the commit message.
