@@ -102,6 +102,8 @@ Below are the details on each of the files in repository.
 _NOTE_: These scripts have been produced for the specific use cases involved in our course.  They are not designed to handle every use case. Nor are they designed to prohibit sufficiently motivated and unethical students from working around the basic restrictions that they impose.  The code has been released under a Creative Commons License (see below) so please feel free to adapt to your purposes. Pull requests that handle additional use cases or improve the robustness of the scripts in a sufficiently general way that does not impact our specific use cases are welcome and will be considered on a case-by-case basis.
 
 ___
+___
+![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")
 ###### All textual materials used in Dickinson College COMP 130 are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/)
 
-###### All executable code used in Dickinson College COMP 130 is licensed under the [GNU General Public License Version 3](https://www.gnu.org/licenses/gpl.txt)
+###### All executable code used in Dickinson College COMP 130 is licenced under the [GNU General Public Licence Version 3](https://www.gnu.org/licenses/gpl.txt)
