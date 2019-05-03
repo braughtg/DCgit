@@ -30,60 +30,86 @@ Below are the details on each of the files in repository.
 
   * Behavior:
     * Updates student specific information within the configuration file.
-    * Configures git to know the username and password of the student.
+    * Performs a basic git configuration.
 
-* __DCgitBegin__ _AssignmentID_ [ _PartnerGitHubID_ ]
+* __DCgitBegin__ _AssignmentID_
   * Run once at the beginning of an assignment to produce an editable version of the assignment that is available to the student.
 
   * Parameters:
     * _AssignmentID_ : The identifier of the repository in the course organization on GitHub.
-    * [ _PartnerGitHubID_ ] : The GitHub username of a partner for a partnered assignment.
-      * _NOTE_: Each assignment is configured to be individual or partnered in the course repository.
 
    * Error Conditions:
-     * If the configuration file for the course does not exist or has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+     * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
      * If the repository does not exist in the course organization the script terminates with a suggestion to check the _AssignmentID_.
-     * If the _PartnerGitHubID_ is specified but the assignment is an individual assignment then the script terminates with an indication that the assignment is not partnered and the _PartnerGitHubID_ should be omitted.
-     * If the _PartnerGitHubID_ is specified and does not exist on GitHub then the script terminates with a suggestion to check the _PartnerGitHubID_.
-     * If the repository already exists in the student's GitHub or the partner's GitHub then the script terminates indicating that the assignment already exists and that _DCgitPull_ may be the intended action.
+     * If the repository already exists in the student's GitHub then the script terminates indicating that the assignment has already been begun and that _DCgitPull_ may be the intended action.
+     * If current working directory on the local machine is has the same name as _AssignmentID_ the script terminates indicating that the assignment has already been begun and that _DCgitPull_ may be the intended action.
+     * If the current working directory has a sub-directory with the same name as _AssignmentID_ the script terminates indicating that the assignment has already been begun and that changing into the directory and using _DCgitPull_ may be the intended action.
 
    * Behavior:
+     * The student is prompted for their GitHub password.
+       * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
      * The repository is copied from the course organization into the student's GitHub as a private repository.
        * _NOTE:_ The repository is copied rather than being forked because it will be private.
-     * If a _PartnerGitHubID_ is specified, the partner will be established as a collaborator on the private repository.
-     * The instructor(s) for the course are added as collaborators on the private repository.
+     * The instructor for the course is added as a collaborator on the private repository.
      * The repository for the assignment is cloned to the student's local machine.
-     * If a _PartnerGitHubID_ is specified the partner's origin is also setup as a remote for the local repository.
-       * _NOTE:_ This is becasue partnered projects will be pushed to both partner anytime either pushes.
+
+* __DCgitPartnerBegin__ _AssignmentID_ _PartnerGitHubID_
+  * Run by the student that did not execute __DCgitBegin__ to be given access to the partner's private repository so that it can be worked on collaboratively.  A stub repository is also created in the student's GitHub to which the instructor will push the final graded work so that both partners own a copy.
+
+  * Parameters:
+    * _AssignmentID_ : The identifier of the repository in the course organization on GitHub.
+    * _PartnerGitHubID_ : The GitHub username of the partner for the assignment.
+
+  * Error Conditions:
+    * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If the assignment exists in the student's GitHub the script terminates with a message indicating that the partner that did not run _DCgitBegin_ should run this script. It also suggests that if both have run _DCgitBegin_ that one will need to run _DCgitExpunge_  and then rerun this script.
+    * If the _PartnerGitHubID_ does not exist on GitHub then the script terminates with a suggestion to check the _PartnerGitHubID_.
+
+  * Behavior
+    * The student is prompted for their GitHub password.
+      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
+    * The partner is prompted for their GitHub password.
+      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
+    * The student is added as a collaborator on the partner's existing private repository.
+      * If the _AssignmentID_ does not exist in the partner's GitHub the script terminates with a message to check the _AssignmentID_, the _PartnerGitHubID_ and to ensure that the partner has run _DCgitBegin_.
+    * The invitation to collaborate on the partner's repository will be accepted.
+    * The repository will be cloned to the student's local machine.
+    * A bare repository for _AssignmentID_ will be create in the student's GitHub so that the instructor can later push the graded work to it.
+    * The instructor is added as a collaborator on the bare repository.
 
 * __DCgitPull__ [ ForceLocal | ForceRemote | Merge ]
   * Run within the assignment repository at the beginning of each work session to pull the most recent version of the assignment down from GitHub to the student's local machine.
 
   * Parameters:
-    * [ ForceLocal | ForceRemote | ForcePartner | Merge ] : Force merge conflicts to be resolved in favor of the local version, the version on the student's GitHub, the version on the partner's GitHub, or to launch a merge tool that will allow the conflicts to be resoved.
+    * [ ForceLocal | ForceRemote | Merge ] : Force merge conflicts to be resolved in favor of the local version, the version on the student's GitHub, or to launch a merge tool that will allow the conflicts to be resolved.
 
   * Error Conditions:
-    * If the configuration file for the course does not exist or has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If not run within an assignment repository the script terminates and suggests changing into an assignment directory and rerunning.
     * If the origin repository does not exist on GitHub the script terminates, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
-    * If ForcePartner is used and the assignment is not paired the script terminates with a message stating that the assignment is not paired.
 
   * Behavior:
+    * The student is prompted for their GitHub password.
+      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
     * Pull the contents of the repository from the appropriate remote.
-      * If there are merge conflicts the script will terminate with a message suggesting the use of one of the _[ ForceLocal | ForceRemote | ForcePartner | Merge ]_ flags.
+      * If there are merge conflicts the script will terminate with a message suggesting the use of one of the _[ ForceLocal | ForceRemote | Merge ]_ flags.
 
 * __DCgitPush__ [ ForceLocal ]
-  * Run within the assignment repository at the end of each work session to push the current version of the assignment from the student's local machine up to GitHub. It is pushed to both the student's GitHub and the partner's GitHub if the assignment is paired.
+  * Run within the assignment repository at the end of each work session to push the current version of the assignment from the student's local machine up to the origin on GitHub.
 
   * Parameters:
-    * [ ForceLocal ] : Forces the repository(ies) on GitHub to look identical to the version on the local machine.
+    * [ ForceLocal ] : Forces the repository on GitHub to look identical to the version on the local machine.
 
   * Error Conditions:
-    * If the configuration file for the course does not exist or has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
-    * If any remote repositories (origin plus the partners if it is a partnered assignment) do not exist on GitHub the script fails, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
+    * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If not run within an assignment repository the script terminates and suggests changing into an assignment directory and rerunning.
+    * If the remote repository does not exist on GitHub the script fails, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
 
   * Behavior:
+    * The student is prompted for their GitHub password.
+      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
     * All of the changes to the local repository are committed using the date/time and local username as the commit message.
-    * The local repository is pushed from the local machine to all remotes on GitHub.
+    * The local repository is pushed from the local machine to the origin on GitHub.
       * If there are merge conflicts the script terminates and a suggestion is made that either a _DCgitPull_ be done to resolve the conflict or that the [ ForceLocal ] flag be used.
 
 * __DCgitExpunge__
@@ -93,15 +119,18 @@ Below are the details on each of the files in repository.
     * None
 
   * Error Conditions:
-    * If the configuration file for the course does not exist or has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If not run within an assignment repository the script terminates and suggests changing into an assignment directory and rerunning.
 
   * Behavior:
+    * The student is prompted for their GitHub password.
+      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
     * The local repository is removed.
     * The repository on the student's GitHub is removed.
+      * _NOTE:_ For a partners, this removes the bare repository that was created, not the partner's origin repository on GitHub.
 
 _NOTE_: These scripts have been produced for the specific use cases involved in our course.  They are not designed to handle every use case. Nor are they designed to prohibit sufficiently motivated and unethical students from working around the basic restrictions that they impose.  The code has been released under a Creative Commons License (see below) so please feel free to adapt to your purposes. Pull requests that handle additional use cases or improve the robustness of the scripts in a sufficiently general way that does not impact our specific use cases are welcome and will be considered on a case-by-case basis.
 
-___
 ___
 ![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")
 ###### All textual materials used in Dickinson College COMP 130 are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/)
