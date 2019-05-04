@@ -29,8 +29,10 @@ if [[ ! -f DCgitConfig.bash ]] ; then
   exit -1
 fi
 
-. ./DCgitConfig.bash
-. ./DCgitLib.bash
+# Load the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/DCgitConfig.bash
+. $SCRIPT_DIR/DCgitLib.bash
 
 # Make sure that the configuration has been done.
 checkThatDCgitIsConfigured
@@ -68,7 +70,7 @@ fi
 
 # Copy the repo from the course into student GitHub as a private repo
 # then clone it to the student's local machine.
-echo "Creating assignment on GitHub..."
+echo "Beginning the assignment "$ASSIGNMENT_ID
 
 # Create an empty repository to push to...
 echo "  Creating the assignment on your GitHub..."
@@ -121,9 +123,9 @@ echo "  Copying the assignment to your local machine..."
 GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
 GIT_OUT=$(git clone $GIT_URL 2>&1)
 
-echo "  Assignment "$ASSIGNMENT_ID" is available."
-echo "    Use cd "$ASSIGNMENT_ID" enter the assignment."
-echo "    Use DCgitPush.bash at the end of each work session."
-echo "    Use DCgitPull.bash at the start of each work session."
-echo "    To add a partner, have the partner run DCgitPartnerBegin on their machine."
 echo "Done."
+echo "Assignment "$ASSIGNMENT_ID" is now available to you."
+echo "  Edit the files in the "$ASSIGNMENT_ID" directory to complete the assignment."
+echo "  Use DCgitPush.bash at the end of each work session."
+echo "  Use DCgitPull.bash at the start of each work session."
+echo "  To add a partner, have the partner run DCgitPartnerBegin on their machine."

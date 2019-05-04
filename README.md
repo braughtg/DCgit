@@ -36,28 +36,28 @@ Below are the details on each of the files in repository.
   * Run once at the beginning of an assignment to produce an editable version of the assignment that is available to the student.
 
   * Parameters:
-    * _AssignmentID_ : The identifier of the repository in the course organization on GitHub.
+    * _AssignmentID_ : The identifier of the assignment repository in the course organization on GitHub.
 
-   * Error Conditions:
-     * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
-     * If the repository does not exist in the course organization the script terminates with a suggestion to check the _AssignmentID_.
-     * If the repository already exists in the student's GitHub then the script terminates indicating that the assignment has already been begun and that _DCgitPull_ may be the intended action.
-     * If current working directory on the local machine is has the same name as _AssignmentID_ the script terminates indicating that the assignment has already been begun and that _DCgitPull_ may be the intended action.
-     * If the current working directory has a sub-directory with the same name as _AssignmentID_ the script terminates indicating that the assignment has already been begun and that changing into the directory and using _DCgitPull_ may be the intended action.
+  * Error Conditions:
+    * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
+    * If the repository does not exist in the course organization the script terminates with a suggestion to check the _AssignmentID_.
+    * If the repository already exists in the student's GitHub then the script terminates indicating that the assignment has already been begun and that _DCgitPull_ may be the intended action.
+    * If current working directory on the local machine is has the same name as _AssignmentID_ the script terminates indicating that the assignment has already been begun and that _DCgitPull_ may be the intended action.
+    * If the current working directory has a sub-directory with the same name as _AssignmentID_ the script terminates indicating that the assignment has already been begun and that changing into the directory and using _DCgitPull_ may be the intended action.
 
-   * Behavior:
-     * The student is prompted for their GitHub password.
-       * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
-     * The repository is copied from the course organization into the student's GitHub as a private repository.
-       * _NOTE:_ The repository is copied rather than being forked because it will be private.
-     * The instructor for the course is added as a collaborator on the private repository.
-     * The repository for the assignment is cloned to the student's local machine.
+  * Behavior:
+    * The student is prompted for their GitHub password.
+      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
+    * The repository is copied from the course organization into the student's GitHub as a private repository.
+      * _NOTE:_ The repository is copied rather than being forked because it will be private.
+    * The instructor for the course is added as a collaborator on the private repository.
+    * The repository for the assignment is cloned to the student's local machine.
 
 * __DCgitPartnerBegin__ _AssignmentID_ _PartnerGitHubID_
   * Run by the student that did not execute __DCgitBegin__ to be given access to the partner's private repository so that it can be worked on collaboratively.  A stub repository is also created in the student's GitHub to which the instructor will push the final graded work so that both partners own a copy.
 
   * Parameters:
-    * _AssignmentID_ : The identifier of the repository in the course organization on GitHub.
+    * _AssignmentID_ : The identifier of the assignment repository in the partner's GitHub.
     * _PartnerGitHubID_ : The GitHub username of the partner for the assignment.
 
   * Error Conditions:
@@ -74,7 +74,7 @@ Below are the details on each of the files in repository.
       * If the _AssignmentID_ does not exist in the partner's GitHub the script terminates with a message to check the _AssignmentID_, the _PartnerGitHubID_ and to ensure that the partner has run _DCgitBegin_.
     * The invitation to collaborate on the partner's repository will be accepted.
     * The repository will be cloned to the student's local machine.
-    * A bare repository for _AssignmentID_ will be create in the student's GitHub so that the instructor can later push the graded work to it.
+    * A bare repository for _AssignmentID_ will be created in the student's GitHub so that the instructor can later push the graded work to it.
     * The instructor is added as a collaborator on the bare repository.
 
 * __DCgitPull__ [ ForceLocal | ForceRemote | Merge ]
@@ -112,22 +112,23 @@ Below are the details on each of the files in repository.
     * The local repository is pushed from the local machine to the origin on GitHub.
       * If there are merge conflicts the script terminates and a suggestion is made that either a _DCgitPull_ be done to resolve the conflict or that the [ ForceLocal ] flag be used.
 
-* __DCgitExpunge__
+* __DCgitExpunge__ _AssignmentID_
   * Run from within an assignment repository to remove an assignment completely from the local machine and the student's GitHub.  This is typically used when something goes horribly wrong and they want to start over from scratch.
 
   * Parameters:
-    * None
+    * _AssignmentID_ : The identifier of the repository to be expunged.
 
   * Error Conditions:
     * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
-    * If not run within an assignment repository the script terminates and suggests changing into an assignment directory and rerunning.
+    * If not run within an assignment repository that agrees with the provided _AssignmentID_ the script terminates and suggests changing into an assignment directory and rerunning.
 
   * Behavior:
+    * The student is asked to type the _AssignmentID_ to confirm that it should be expunged, or anything else to terminate the operation.
     * The student is prompted for their GitHub password.
       * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
-    * The local repository is removed.
     * The repository on the student's GitHub is removed.
-      * _NOTE:_ For a partners, this removes the bare repository that was created, not the partner's origin repository on GitHub.
+      * _NOTE:_ This will not remove any repositories from a partner's GitHub (either bare or with the graded results).
+    * The local repository is removed.
 
 _NOTE_: These scripts have been produced for the specific use cases involved in our course.  They are not designed to handle every use case. Nor are they designed to prohibit sufficiently motivated and unethical students from working around the basic restrictions that they impose.  The code has been released under a Creative Commons License (see below) so please feel free to adapt to your purposes. Pull requests that handle additional use cases or improve the robustness of the scripts in a sufficiently general way that does not impact our specific use cases are welcome and will be considered on a case-by-case basis.
 
