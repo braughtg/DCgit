@@ -103,7 +103,8 @@ Below are the details on each of the files in repository.
   * Error Conditions:
     * If the configuration file has not been updated the script terminates with a suggestion to be sure that _DCgitSetup_ is run prior to use of the other scripts.
     * If not run within an assignment repository the script terminates and suggests changing into an assignment directory and rerunning.
-    * If the remote repository does not exist on GitHub the script fails, explaining that the assignment has been removed from GitHub and that help should be sought to resolve the issue.
+    * If the remote repository does not exist on GitHub the script fails, explaining that the assignment does not exist on GitHub and that help should be sought to resolve the issue.
+      * A new blank repository can be created manually and then the push will work.
 
   * Behavior:
     * The student is prompted for their GitHub password.

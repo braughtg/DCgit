@@ -23,12 +23,6 @@ else
   exit -1
 fi
 
-if [[ ! -f DCgitConfig.bash ]] ; then
-  echo "DCgitBegin.bash must be run from the top level course directory."
-  echo "If you are in an assignment directory, use cd .. to get to the course directory."
-  exit -1
-fi
-
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
 . $SCRIPT_DIR/DCgitConfig.bash
@@ -39,9 +33,6 @@ checkThatDCgitIsConfigured
 
 # Obtain and validate the student's GitHub password
 STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
-
-# Check the error conditions that would prevent this operation.
-echo "Checking preconditions..."
 
 # If the assignment does not exist in the course organization...
 if ! $(publicRepoExistsOnGitHub $ASSIGNMENT_ID $GITHUB_COURSE_ORG) ; then

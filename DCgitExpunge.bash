@@ -37,7 +37,7 @@ SCRIPT_DIR=$(dirname $0)
 checkThatDCgitIsConfigured
 
 # Get confirmation that the assignment is to be expunged...
-echo -n "Confirm expunge by typing the assignment name: "
+echo -n "Type the assignment name to confirm expunge: "
 read NAME_CHECK
 if [ ! $NAME_CHECK == $ASSIGNMENT_ID ] ; then
   echo "Expunge canceled."
@@ -68,3 +68,4 @@ cd ..
 rm -rf $ASSIGNMENT_ID 2>&1 > /dev/null
 
 echo "Done."
+echo "Use cd .. to return to the parent directory."
