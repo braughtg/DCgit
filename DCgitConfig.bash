@@ -20,3 +20,9 @@ INSTRUCTOR_GITHUB_ID="braughtg"
 
 STUDENT_GITHUB_ID="braughtstu"
 STUDENT_GITHUB_PASSWORD="1NC7WXUjOB"
+
+if ! $CONFIGURED ; then
+  echo "DCgit has not been configured for this computer."
+  echo "Please run DCgitSetup.bash"
+  exit -1
+fi

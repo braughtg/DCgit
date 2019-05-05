@@ -28,30 +28,32 @@ SCRIPT_DIR=$(dirname $0)
 . $SCRIPT_DIR/DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
 
-# Make sure that the configuration has been done.
-checkThatDCgitIsConfigured
-
 # Obtain and validate the student's GitHub password
 STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
 
 # If the assignment does not exist in the course organization...
 if ! $(publicRepoExistsOnGitHub $ASSIGNMENT_ID $GITHUB_COURSE_ORG) ; then
   echo $ASSIGNMENT_ID" was not found in the course "$GITHUB_COURSE_ORG"."
-  echo "Check the assignment name and try again."
+  echo "Things to check:"
+  echo "  Is the assignment name correct?"
   exit -1
 fi
 
 # If the assignment already exists that the student's GitHub...
 if $(repoExistsOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
   echo "It appears that you have already begun "$ASSIGNMENT_ID"."
-  echo "Did you mean to cd "$ASSIGNMENT_ID" and then DCgitPull.bash?"
+  echo "Things to check:"
+  echo "  Did you mean to use DCgitClone.bash?"
+  echo "  Did you mean to cd "$ASSIGNMENT_ID" and then DCgitPull.bash?"
   exit -1
 fi
 
 # If the current directory has a directory with the assginment name...
-if [[ " $(ls) " == *" $ASSIGNMENT_ID "* ]] ; then
+if [[ -d $ASSIGNMENT_ID ]] ; then
   echo "It appears that you have already begun "$ASSIGNMENT_ID"."
-  echo "Did you mean to cd "$ASSIGNMENT_ID" and then DCgitPull.bash?"
+  echo "Things to check:"
+  echo "  Did you mean to use DCgitClone.bash?"
+  echo "  Did you mean to cd "$ASSIGNMENT_ID" and then DCgitPull.bash?"
   exit -1
 fi
 
@@ -68,6 +70,7 @@ echo "  Creating the assignment on your GitHub..."
 SUCCESS=$(createNewRepoOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD true)
 if ! $SUCCESS ; then
   echo "  There was a problem creating the assignment repository on GitHub"
+  echo "  Try again and if the problem persists check with your instructor for assistance."
   exit -1
 fi
 
@@ -109,14 +112,7 @@ GIT_OUT=$(git push --mirror $GIT_URL 2>&1)
 cd ..
 rm -rf $ASSIGNMENT_ID.git 2>&1 > /dev/null
 
-# Clone the student's repo from GitHub to the local machine.
-echo "  Copying the assignment to your local machine..."
-GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
-GIT_OUT=$(git clone $GIT_URL 2>&1)
-
 echo "Done."
-echo "Assignment "$ASSIGNMENT_ID" is now available to you."
-echo "  Edit the files in the "$ASSIGNMENT_ID" directory to complete the assignment."
-echo "  Use DCgitPush.bash at the end of each work session."
-echo "  Use DCgitPull.bash at the start of each work session."
-echo "  To add a partner, have the partner run DCgitPartnerBegin on their machine."
+echo "Assignment "$ASSIGNMENT_ID" is now ready to be cloned."
+echo "  Use DCgitClone.bash to obtain a local copy of the assignment."
+echo "  Partners should use DCgitPartnerClone to obtain a local copy of the assignment."

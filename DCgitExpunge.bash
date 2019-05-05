@@ -23,6 +23,7 @@ else
   exit -1
 fi
 
+# Check that we are within the assignment directory...
 if [[ ! $(pwd) == *"$ASSIGNMENT_ID" ]] ; then
   echo "To expunge "$ASSIGNMENT_ID" DCgitExpunge.bash must be run from within the "$ASSIGNMENT_ID" directory."
   exit -1
@@ -33,15 +34,12 @@ SCRIPT_DIR=$(dirname $0)
 . $SCRIPT_DIR/DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
 
-# Make sure that the configuration has been done.
-checkThatDCgitIsConfigured
-
 # Get confirmation that the assignment is to be expunged...
 echo -n "Type the assignment name to confirm expunge: "
 read NAME_CHECK
 if [ ! $NAME_CHECK == $ASSIGNMENT_ID ] ; then
-  echo "Expunge canceled."
   echo "The assignment name entered ("$NAME_CHECK") does not match this assignment ("$ASSIGNMENT_ID")."
+  echo "Expunge canceled."
   exit -1
 fi
 
@@ -58,7 +56,8 @@ echo "  Deleting the assignment from your GitHub..."
 SUCCESS=$(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
 if ! $SUCCESS ; then
   echo "    There was a problem removing the "$ASSIGNMENT_ID" repository from your GitHub."
-  echo "    Try removing the GitHub repository and deleting the local repository manually."
+  echo "    Things to try:"
+  echo "      Try removing the GitHub repository and deleting the local repository manually."
   exit -1
 fi
 

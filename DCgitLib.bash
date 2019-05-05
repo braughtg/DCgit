@@ -13,13 +13,6 @@
 #
 # Copyright 2019 Grant Braught
 
-function checkThatDCgitIsConfigured {
-  if ! $CONFIGURED ; then
-    echo "Error: DCgit has not been configured for this computer. Please run DCgitSetup.bash"
-    exit -1
-  fi
-}
-
 function getGitHubPassword {
   # NOTE: This function should alwasy be called as RES=$(getGitHubPassword user pass)
   # otherwise output will appear twice.
@@ -41,7 +34,7 @@ function getGitHubPassword {
 
   while ! $PASSWORD_SET ; do
     # NOTE: Using > /dev/tty prevents prompts from appearing in echoed return value.
-    echo -n "GitHub password for "$GITHUB_ID": " > /dev/tty
+    echo -n "Enter GitHub password for "$GITHUB_ID": " > /dev/tty
     read -s GITHUB_PASSWORD
     echo "" > /dev/tty
 
@@ -127,31 +120,5 @@ function addCollaboratorToRepoOnGitHub {
     echo true
   else
     echo false
-  fi
-}
-
-#####
-
-function checkThatUserExistsOnGitHub {
-  local GITHUB_ID=$1
-
-  local GITHUB_RESP=$(curl -s -S https://api.github.com/search/users?q=$GITHUB_ID | tr '\"' "@")
-  if ! [[ $GITHUB_RESP == *"@$GITHUB_ID@"* ]]; then
-    echo "Error: User $GITHUB_ID not found on GitHub. Check the GitHub username and try again."
-    exit -1
-  fi
-}
-
-function addCollaboratorToAssignmentOnGitHub {
-  local REPO_ID=$1
-  local STUDENT_ID=$2
-  local COLLABORATOR_ID=$3
-
-  checkThatAssignmentExistsOnGitHub $REPO_ID $STUDENT_ID true
-  checkThatUserExistsOnGitHub $COLLABORATOR_ID
-
-  local GITHUB_RESP=$(curl -s -S -u $STUDENT_ID -X PUT 'https://api.github.com/repos/'$STUDENT_ID'/'$REPO_ID'/collaborators/'$COLLABORATOR_ID -d '')
-  if [[ $GITHUB_RESP == *"Bad credentials"* ]] ;  then
-    echo "Error: Incorrect GitHub password for $STUDENT_ID. Please try again."
   fi
 }

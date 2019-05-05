@@ -31,7 +31,8 @@ fi
 ASSIGNMENT_ID=$(basename $(pwd))
 if [ ! -f .dcgit.bash ] ; then
   echo "DCgitPush.bash must be run from within an assignment directory."
-  echo "Use cd to change into an assignment directory and try again."
+  echo "Things to try:"
+  echo "  Use cd to change into the assignment directory."
   exit -1
 fi
 
@@ -39,9 +40,6 @@ fi
 SCRIPT_DIR=$(dirname $0)
 . $SCRIPT_DIR/DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
-
-# Make sure that the configuration has been done.
-checkThatDCgitIsConfigured
 
 # Obtain and validate the student's GitHub password
 STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
@@ -112,7 +110,7 @@ if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
   git reset --soft HEAD~1 2>&1 > /dev/null
   echo "    There are conflicts between changes you have made and changes already pushed to GitHub."
   echo "    Likely you or a partner pushed changes from another machine that you have not pulled."
-  echo "    Things you might try:"
+  echo "    Things to try:"
   echo "       Use DCgitPull.bash to update your version with the changes on GitHub."
   echo "       Use DCGitPush.bash ForceLocal to replace the GitHub version with your version."
   exit -1
