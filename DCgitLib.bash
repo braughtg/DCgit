@@ -65,13 +65,13 @@ function publicRepoExistsOnGitHub {
 }
 
 function repoExistsOnGitHub {
-  # Includes all repos public and private.
+  # Includes all repos public and private that are owned by GITHUB_ID.
   local REPO_ID=$1
   local GITHUB_ID=$2
   local GITHUB_PASSWORD=$3
 
   local GITHUB_URL="https://api.github.com/user/repos"
-  local GITHUB_RESP=$(curl -s -S $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD -G -d affiliation=owner | tr '\"' "@" 2>&1)
   if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]] ; then
     echo true
   else
@@ -100,8 +100,38 @@ function deleteRepoFromGitHub {
   local GITHUB_PASSWORD=$3
 
   local GITHUB_URL="https://api.github.com/repos/"$GITHUB_ID/$REPO_ID
-  local GITHUB_RESP=$(curl -s -S -X DELETE $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD 2>&1)
+  local GITHUB_RESP=$(curl -s -S $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD -X DELETE 2>&1)
   if [[ $GITHUB_RESP == "" ]]; then
+    echo true
+  else
+    echo false
+  fi
+}
+
+function checkIfCollaboratorOnRepoOnGitHub {
+  local REPO_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+  local COLLABORATOR_ID=$4
+
+  local GITHUB_URL="https://api.github.com/repos/"$GITHUB_ID"/"$REPO_ID"/collaborators/"$COLLABORATOR_ID
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" | tr '\"' "@" 2>&1)
+  if ! [[ $GITHUB_RESP == *"@Not Found@"* ]]; then
+    echo true
+  else
+    echo false
+  fi
+}
+
+function removeCollaboratorFromRepoOnGitHub {
+  local REPO_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+  local COLLABORATOR_ID=$4
+
+  local GITHUB_URL="https://api.github.com/repos/"$GITHUB_ID"/"$REPO_ID"/collaborators/"$COLLABORATOR_ID
+  local GITHUB_RESP=$(curl -s -S -X DELETE $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" 2>&1)
+  if [[ "$GITHUB_RESP" == "" ]]; then
     echo true
   else
     echo false
@@ -115,10 +145,34 @@ function addCollaboratorToRepoOnGitHub {
   local COLLABORATOR_ID=$4
 
   local GITHUB_URL="https://api.github.com/repos/"$GITHUB_ID"/"$REPO_ID"/collaborators/"$COLLABORATOR_ID
-  local GITHUB_RESP=$(curl -s -S -u "$GITHUB_ID:$GITHUB_PASSWORD" -X PUT $GITHUB_URL -d '' | tr '\"' "@" 2>&1)
+  local GITHUB_RESP=$(curl -s -S -X PUT $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" -d '' | tr '\"' "@" 2>&1)
   if [[ $GITHUB_RESP == *"@login@: @$COLLABORATOR_ID@"* ]]; then
     echo true
   else
     echo false
+  fi
+}
+
+function acceptCollborationInviteOnGitHub {
+  local REPO_ID=$1
+  local COLLABORATOR_ID=$2
+  local GITHUB_ID=$3
+  local GITHUB_PASSWORD=$4
+
+  # Get the invitation id from GitHub...
+  local GITHUB_URL="https://api.github.com/user/repository_invitations"
+  local GITHUB_RESP=$(curl -s -S $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" 2>&1)
+  INVITATION_ID=$(echo $GITHUB_RESP | python getInvites.py $REPO_ID $GITHUB_ID $COLLABORATOR_ID)
+  if [[ "$INVITATION_ID" == "" ]] ; then
+    echo false
+  else
+    # Accept the invitation...
+    local GITHUB_URL="https://api.github.com/user/repository_invitations/$INVITATION_ID"
+    local GITHUB_RESP=$(curl -s -S -X PATCH $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" 2>&1)
+    if [[ "$GITHUB_RESP" == "" ]]; then
+      echo true
+    else
+      echo false
+    fi
   fi
 }

@@ -61,14 +61,13 @@ Below are the details on each of the files in repository.
     * If the current directory is a DCgit assignment directory the script terminates stating that one assignment cannot be cloned into another assignment.
     * If current working directory on the local machine has the same name as _AssignmentID_ the script terminates indicating that the assignment has already been cloned and that _DCgitPull_ may be the intended action.
     * If the current working directory has a sub-directory with the same name as _AssignmentID_ the script terminates indicating that the assignment has already been cloned and that changing into the directory and using _DCgitPull_ may be the intended action.
+    * If the _AssignmentID_ does not exist in the student's GitHub the script terminates suggesting that the _AssignmentID_ be checked and to ensure that _DCgitBegin_ was run before _DCgitClone_
 
   * Behavior:
     * The student is prompted for their GitHub password.
     * The _AssignmentID_ repository is cloned to the student's local machine.
-      * If the _AssignmentID_ does not exist in the student's GitHub the script terminates suggesting that the _AssignmentID_ be checked and to ensure that _DCgitBegin_ was run before _DCgitClone_
 
 * __DCgitPartnerClone__ _AssignmentID_ _PartnerGitHubID_
-
   * Run once on each machine being used by a partner (i.e. not the student that ran _DCgitBegin_) to obtain a local copy of the shared project.
 
   * Parameters:
@@ -80,13 +79,13 @@ Below are the details on each of the files in repository.
     * If the current directory is a DCgit assignment directory the script terminates stating that one assignment cannot be cloned into another assignment.
     * If current working directory on the local machine has the same name as _AssignmentID_ the script terminates indicating that the assignment has already been cloned and that _DCgitPull_ may be the intended action.
     * If the current working directory has a sub-directory with the same name as _AssignmentID_ the script terminates indicating that the assignment has already been cloned and that changing into the directory and using _DCgitPull_ may be the intended action.
+    * If the partner doesn't exist or does not have a repository for _AssignmentID_ then the script terminates suggesting that the _AssignmentID_ be checked and to be sure that the partner has run _DCgitBegin_.
+    * If the assignment already exists in the student's GitHub the script terminates suggesting that that the assignment has already been cloned or partner cloned and that _DCgitPull_ may be the right action. Or possibly that _DCgitExpunge_ should be used and the assignment cloned or partner cloned again.
 
   * Behavior:
     * The student is prompted for their GitHub password.
     * The partner (the one who ran _DCgitBegin_) is prompted for their password.
-      * If the partner doesn't exist or does not have a repository for _AssignmentID_ then the script terminates suggesting that the _AssignmentID_ be checked and to be sure that the partner has run _DCgitBegin_.
     * A blank repository with the name _AssignmentID_ is created in the Student's GitHub. This is where the final result will be pushed by the instructor after grading.
-      * If that assignment already exists the script terminates suggesting that that the assignment has already been cloned or partner cloned and that _DCgitPull_ may be the right action. Or possibly that _DCgitExpunge_ should be used and the assignment cloned or partner cloned again.
     * The instructor is added as a collaborator on the student's blank repository.
     * The student is added as a collaborator on the partner's repository.
     * The invitation to collaborate on the partner's repository is accepted for the student.
@@ -122,7 +121,6 @@ Below are the details on each of the files in repository.
 
   * Behavior:
     * The student is prompted for their GitHub password.
-      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
     * All of the changes to the local repository are committed using the date/time and local username as the commit message.
     * The local repository is pushed from the local machine to the origin on GitHub.
       * If there are merge conflicts the script terminates and a suggestion is made that either a _DCgitPull_ be done to resolve the conflict or that the [ ForceLocal ] flag be used.
@@ -140,7 +138,6 @@ Below are the details on each of the files in repository.
   * Behavior:
     * The student is asked to type the _AssignmentID_ to confirm that it should be expunged, or anything else to terminate the operation.
     * The student is prompted for their GitHub password.
-      * If the password is not valid the script terminates with a message saying the password was incorrect and to try again.
     * The repository on the student's GitHub is removed.
       * _NOTE:_ This will not remove any repositories from a partner's GitHub (either bare or with the graded results).
     * The local repository is removed.

@@ -69,7 +69,6 @@ fi
 # Everything looks cool so...
 #
 echo "Cloning the assignment "$ASSIGNMENT_ID" to the local machine."
-
 GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
 GIT_OUT=$(git clone $GIT_URL 2>&1)
 
