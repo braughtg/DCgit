@@ -38,58 +38,53 @@ fi
 
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
-. $SCRIPT_DIR/DCgitConfig.bash
+. $SCRIPT_DIR/.DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
 
 # Obtain and validate the student's GitHub password
 STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
 
-# Make sure that the target repository exits in the student's GitHub...
-if ! $(repoExistsOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
-  echo "Assignment "$ASSIGNMENT_ID" does not exist on your GitHub."
+# Make sure that the target repository is accessible to the student on GitHub...
+if ! $(repoAccessibleOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+  echo "Assignment "$ASSIGNMENT_ID" is not accessible by you on GitHub."
   echo "See your instructor for assistance in resolving this issue."
   exit -1
-
-  # Could just create the empty remote repository and just push to it...
-  # But this gives a chance to discuss it with the students...
-  # And to get insight into how they got the assignment without DGgitBegin...
 fi
 
 #
 # Everything looks cool so...
 #
 
+echo "Pushing "$ASSIGNMENT_ID" to git hub..."
+
 # Confirm that there are changes to push...
 GIT_OUT=$(git status 2>&1)
-if [[ $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
-  echo "There have been no changes to the assignment, canceling DCgitPush.bash."
-  exit -1
+if [[ $GIT_OUT == *"Your branch is up to date"* && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
+  echo "  There have been no changes to the local assignment. Nothing to push."
+  echo "Done."
+  exit 1
 fi
-
-#Your branch is ahead
 
 GIT_FORCE_PARAM=""
 if $FORCE_LOCAL ; then
-  echo "Request to force local version..."
-  echo "  This will overwrite any changes to the assignemnt already on GitHub with your local version."
-  echo "  Work done on another machine or by a partner may be lost."
-  echo -n "  Type ForceLocal to confirm: "
+  echo "  Request to force local version..."
+  echo "    This will overwrite any changes to the assignemnt already on GitHub with your local version."
+  echo "    Work done on another machine or by a partner may be lost."
+  echo -n "    Type ForceLocal to confirm: "
   read CONFIRM
-  if [ $CONFIRM == "ForceLocal" ] ; then
+  if [[ $CONFIRM == "ForceLocal" ]] ; then
     GIT_FORCE_PARAM="--force"
   else
-    echo "  ForceLocal was not entered, canceling DCgitPush.bash ForceLocal."
+    echo "    ForceLocal was not entered, canceling DCgitPush.bash ForceLocal."
     exit -1
   fi
 fi
 
-echo "Pushing "$ASSIGNMENT_ID" to git hub..."
-
-echo "  Staging all changes to the assignemnt..."
+echo "  Staging all local changes to the assignemnt..."
 # Add all of the changed files...
 GIT_OUT=$(git add --all 2>&1)
 if [[ $GIT_OUT != "" ]] ; then
-  # unstage everyting just to be safe.
+  # unstage everyting to put it back the way we found it...
   git reset 2>&1 > /dev/null
   echo "    Problem staging the changed assignment."
   echo "    See your instructor for assistance."
@@ -108,6 +103,9 @@ GIT_OUT=$(git push $GIT_FORCE_PARAM origin master 2>&1)
 if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
   # Undo the last commit to put things back the way we found them...
   git reset --soft HEAD~1 2>&1 > /dev/null
+  # Unstage everything that was staged...
+  git reset 2>&1 > /dev/null
+
   echo "    There are conflicts between changes you have made and changes already pushed to GitHub."
   echo "    Likely you or a partner pushed changes from another machine that you have not pulled."
   echo "    Things to try:"
@@ -119,6 +117,7 @@ fi
 GIT_OUT=$(git status 2>&1)
 if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
   echo "    There was a problem pushing the changed assignment to GitHub."
+  echo "    Ensure that you have write access to the assignment."
   echo "    See your instructor for assistance."
   exit -1
 fi

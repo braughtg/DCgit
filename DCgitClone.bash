@@ -25,7 +25,7 @@ fi
 
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
-. $SCRIPT_DIR/DCgitConfig.bash
+. $SCRIPT_DIR/.DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
 
 # Obtain and validate the student's GitHub password
@@ -56,7 +56,7 @@ if [ -f .dcgit.bash ] ; then
 fi
 
 # Check if the requested assignment exists in the student's GitHub...
-if ! $(repoExistsOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+if ! $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
   echo "The assignment "$ASSIGNMENT_ID" does not appear to have been begun."
   echo "Things to check:"
   echo "  Is the assignment name correct?"

@@ -23,6 +23,6 @@ STUDENT_GITHUB_PASSWORD="1NC7WXUjOB"
 
 if ! $CONFIGURED ; then
   echo "DCgit has not been configured for this computer."
-  echo "Please run DCgitSetup.bash"
+  echo "Please run DCgitConfigure.bash before using the DCgit commands."
   exit -1
 fi

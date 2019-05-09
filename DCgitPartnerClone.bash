@@ -27,7 +27,7 @@ fi
 
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
-. $SCRIPT_DIR/DCgitConfig.bash
+. $SCRIPT_DIR/.DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
 
 # Obtain and validate the student's GitHub password
@@ -61,7 +61,7 @@ if [ -f .dcgit.bash ] ; then
 fi
 
 # Check if the student's GitHub has the requested assignment...
-if $(repoExistsOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
   echo "You already have the assignment "$ASSIGNMENT_ID" in your GitHub."
   echo "Things to check:"
   echo "  Did you mean to use DCgitPull.bash?"
@@ -71,7 +71,7 @@ if $(repoExistsOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWO
 fi
 
 # Check if the partner's GitHub has the requested assignment...
-if ! $(repoExistsOnGitHub $ASSIGNMENT_ID $PARTNER_GITHUB_ID $PARTNER_GITHUB_PASSWORD) ; then
+if ! $(repoOwnedOnGitHub $ASSIGNMENT_ID $PARTNER_GITHUB_ID $PARTNER_GITHUB_PASSWORD) ; then
   echo "The partner "$PARTNER_GITHUB_ID" does not have the assignment "$ASSIGNMENT_ID"."
   echo "Things to check:"
   echo "  Is the partner's GitHub ID correct?"

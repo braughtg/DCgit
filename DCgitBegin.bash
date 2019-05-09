@@ -25,14 +25,14 @@ fi
 
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
-. $SCRIPT_DIR/DCgitConfig.bash
+. $SCRIPT_DIR/.DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
 
 # Obtain and validate the student's GitHub password
 STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
 
 # If the assignment does not exist in the course organization...
-if ! $(publicRepoExistsOnGitHub $ASSIGNMENT_ID $GITHUB_COURSE_ORG) ; then
+if ! $(repoPublicOnGitHub $ASSIGNMENT_ID $GITHUB_COURSE_ORG) ; then
   echo $ASSIGNMENT_ID" was not found in the course "$GITHUB_COURSE_ORG"."
   echo "Things to check:"
   echo "  Is the assignment name correct?"
@@ -40,7 +40,7 @@ if ! $(publicRepoExistsOnGitHub $ASSIGNMENT_ID $GITHUB_COURSE_ORG) ; then
 fi
 
 # If the assignment already exists that the student's GitHub...
-if $(repoExistsOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
   echo "It appears that you have already begun "$ASSIGNMENT_ID"."
   echo "Things to check:"
   echo "  Did you mean to use DCgitClone.bash?"

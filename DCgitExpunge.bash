@@ -31,7 +31,7 @@ fi
 
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
-. $SCRIPT_DIR/DCgitConfig.bash
+. $SCRIPT_DIR/.DCgitConfig.bash
 . $SCRIPT_DIR/DCgitLib.bash
 
 # Get confirmation that the assignment is to be expunged...

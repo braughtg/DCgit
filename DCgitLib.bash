@@ -51,7 +51,7 @@ function getGitHubPassword {
   echo $GITHUB_PASSWORD
 }
 
-function publicRepoExistsOnGitHub {
+function repoPublicOnGitHub {
   local REPO_ID=$1
   local GITHUB_ID=$2
 
@@ -64,7 +64,25 @@ function publicRepoExistsOnGitHub {
   fi
 }
 
-function repoExistsOnGitHub {
+function repoAccessibleOnGitHub {
+  # Includes all repos public and private that are accessible by GITHUB_ID.
+  # NOTE: This does not guarantee push access but a collaborator would have
+  #       had to manually disable push access for a partner to make that
+  #       not true.  Unlikely, but possible...
+  local REPO_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+
+  local GITHUB_URL="https://api.github.com/user/repos"
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]] ; then
+    echo true
+  else
+    echo false
+  fi
+}
+
+function repoOwnedOnGitHub {
   # Includes all repos public and private that are owned by GITHUB_ID.
   local REPO_ID=$1
   local GITHUB_ID=$2
