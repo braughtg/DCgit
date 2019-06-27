@@ -13,13 +13,7 @@
 #
 # Copyright 2019 Grant Braught
 
-CONFIGURED=true
-
-GITHUB_COURSE_ORG="dickinson-comp130"
-INSTRUCTOR_GITHUB_ID="braughtg"
-
-STUDENT_GITHUB_ID="braughtstu"
-STUDENT_GITHUB_PASSWORD=""
+CONFIGURED=false
 
 if ! $CONFIGURED ; then
   echo "DCgit has not been configured for this computer."
