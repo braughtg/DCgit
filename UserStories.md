@@ -20,7 +20,7 @@
   - Ask again if failure to authenticate with GitHub
 1. The script then:
   1. Clones the assignment repository from the Course to the student's GitHub as a private repository.
-  1. Adds the instructor to collaborate on the assignment repository.
+  1. Invites the instructor to collaborate on the assignment repository.
   1. Invites the partner (if specified) to collaborate on the assignment repository.
   1. Clones the assignment from the student's GitHub to the local machine.
 1. The script terminates if:
@@ -41,21 +41,21 @@
 1. Copy URL of student's assignment repository on GitHub.
 1. Open terminal on the local machine.
 1. Change to course directory.
-1. git clone AssignmentURL
+1. git clone _AssignmentURL_
 
 ### Adding and Removing Partners
 
 #### Adding Instructor or Partner after Starting an Assignment:
 1. Add the instructor or partner as collaborators on the assignment repository.
-  1. Open the _Settings_ tab (_gear icon_) for the repository
-  1. Choose _Collaborators_
+  1. Open the "Settings" tab (_gear icon_) for the repository
+  1. Choose "Collaborators"
   1. Add the instructor and/or partner
 
 #### Removing a Partner from an Assignment:
 1. Remove the partner as collaborators on the assignment repository.
-  1. Open the _Settings_ tab (_gear icon_) for the repository
-  1. Choose _Collaborators_
-  1. Click the _X_ next to partner's ID
+  1. Open the "Settings" tab (_gear icon_) for the repository
+  1. Choose "Collaborators"
+  1. Click the "X" next to partner's ID
 
 ### Working on an Assignment
 
@@ -115,6 +115,13 @@
 
 ## For Faculty
 
+#### Setup
+1. Configure git
+  - git config --global user.name <GitHubUserName>
+  - git config --global user.email <you@email.org>
+  - git config --global push.default simple
+  - git config --global credential.helper cache
+
 #### Creating a new Course
 1. Create a organization for the course (a new organization is recommended for each course.)
 1. Use the DCGit repo as a template to create new repository for the course in the organization.
@@ -124,10 +131,10 @@
   - GITHUB_COURSE_ORG - point to the owner of the course repository.
   - INSTRUCTOR_GITHUB_ID - id of the instructor for invitations to student repositories.
 1. Commit and push the changes.
-1. Create assignments
+1. Create assignments.
 
 #### Creating an Assignment
-1.  Create an repository in the course organization for the assignment.
+1.  Create a repository in the course organization for the assignment.
   - Use DCgitAssignmentTemplate as a template to get the default licenses pre-configured in the README.md.
 1. Clone the assignment repository.
 1. Add instructions, files and resources as necessary.
@@ -137,11 +144,11 @@
 1. Open terminal
 1. Change to course directory
 1. ./Instructor/DCgitCollect _AssignmentID_ _StudentList_
-1. Enter _GitHubUserName_ and _GitHubPassword_
 1. The script then:
   - reads the _StudentList_ file from the Instructor directory.
-    - See the sample _StudentList_ file in the Instructor directory.
+    - See the _StudentList.sample_ file in the Instructor directory.
   - Clones each of the student repositories into a directory named _AssignmentID_.submissions in the course directory.
+1. Mark and comment on the files in the student repositories.
 1. The script terminates if:
   - There is not a readable _StudentList_ file in the Instructor directory.
 
@@ -149,7 +156,6 @@
 1. Open terminal
 1. Change to the assignment directory
 1. ./Instructor/DCgitReturn _AssignmentID_
-1. Enter _GitHubUserName_ and _GitHubPassword_
 1. The script then:
   - Commits and pushes all changes to all repositories in the _AssignmentID_.submissions directory.
 1. The script terminates if:
