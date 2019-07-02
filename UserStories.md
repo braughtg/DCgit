@@ -19,16 +19,16 @@
 1. Enter _GitHubUserName_ and _GitHubPassword_ (if not saved during configuration.)
   - Ask again if failure to authenticate with GitHub
 1. The script then:
-  1. Clones the assignment repository from the Course to the student's GitHub as a private repository.
+  1. Copies the assignment repository from the Course GitHub organization to the student's GitHub as a private repository.
   1. Invites the instructor to collaborate on the assignment repository.
   1. Invites the partner (if specified) to collaborate on the assignment repository.
   1. Clones the assignment from the student's GitHub to the local machine.
 1. The script terminates if:
   - it is not running inside of the course directory.
   - the assignment repository already exists locally in the course directory.
-  - _PartnerID_ (if specified) does not exist on GitHub.
   - the Course repository for the assignment doesn't exist
   - the assignment repository already exists in the student GitHub.
+  - _PartnerID_ (if specified) does not exist on GitHub.
 
 #### Manually through GitHub:
 1. Copy URL of assignment repository from the Course.
