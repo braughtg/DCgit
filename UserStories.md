@@ -121,6 +121,7 @@
   - git config --global user.email <you@email.org>
   - git config --global push.default simple
   - git config --global credential.helper cache
+    - Note: credential.helper is not required and will make it so you don't have to repeatedly enter username and password.
 
 #### Creating a new Course
 1. Create a organization for the course (a new organization is recommended for each course.)
@@ -160,3 +161,7 @@
   - Commits and pushes all changes to all repositories in the _AssignmentID_.submissions directory.
 1. The script terminates if:
   - There is no _AssignmentID_.submissions directory.
+
+  ___
+  ![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")
+  ###### All textual materials used in this course are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/)
