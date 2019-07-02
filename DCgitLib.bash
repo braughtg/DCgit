@@ -66,6 +66,7 @@ function repoPublicOnGitHub {
 
 function repoAccessibleOnGitHub {
   # Includes all repos public and private that are accessible by GITHUB_ID.
+  # This includes on which GITHUB_ID is a collaborator.
   # NOTE: This does not guarantee push access but a collaborator would have
   #       had to manually disable push access for a partner to make that
   #       not true.  Unlikely, but possible...
@@ -80,6 +81,18 @@ function repoAccessibleOnGitHub {
   else
     echo false
   fi
+}
+
+function getAccessibleRepoFullName {
+  local REPO_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+
+  local GITHUB_URL="https://api.github.com/user/repos"
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+
+  echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@.*TestAssignment@$" | cut -f4 -d'@'
+
 }
 
 function repoOwnedOnGitHub {
