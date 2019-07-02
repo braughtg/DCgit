@@ -3,6 +3,9 @@
 ## For Students
 
 ### Beginning a new Course
+
+The course must be begun on each machine so that the necessary scripts are present in the student account on the machine.
+
 1. Open terminal
 1. git clone _CourseGitHubURL_
   - _CourseGitHubURL_ will be given by the instructor.
@@ -10,6 +13,8 @@
 1. ./DCGitConfigure
 
 ### Starting an Assignment
+
+An assignment needs to be started only once, and only by one partner if the work is paired.
 
 #### Using the Scripts:
 1. Open terminal
@@ -45,6 +50,8 @@
 
 ### Adding and Removing Partners
 
+A partner and the instructor are automatically added as collaboratoprs when the DCgitBegin script is used.  So using it is the easiest way to have them setup.
+
 #### Adding Instructor or Partner after Starting an Assignment:
 1. Add the instructor or partner as collaborators on the assignment repository.
   1. Open the "Settings" tab (_gear icon_) for the repository
@@ -58,6 +65,8 @@
   1. Click the "X" next to partner's ID
 
 ### Working on an Assignment
+
+Each work session should begin by pulling the work from GitHub and end by pushing the work to GitHub.
 
 #### Pulling an Assignment from GitHub to Local Machine:
 1. Open terminal (if not already open)
