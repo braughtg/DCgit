@@ -53,7 +53,7 @@ if ! $(repoAccessibleOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_
   echo "You do not have access to "$ASSIGNMENT_ID" on GitHub."
   echo "Things to check:"
   echo "  Make sure you or your partner has used DCgitBegin to start the assignment"
-  echo "  If your partner used DCgitBegin:
+  echo "  If your partner used DCgitBegin:"
   echo "    Make sure you have accepted your partner's invitation to collaborate on "$ASSIGNMENT_ID"."
   echo "    Make sure your partner added you as a collaborator on "$ASSIGNMENT_ID"."
   exit -1

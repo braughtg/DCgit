@@ -119,9 +119,7 @@ Each work session should begin by pulling the work from GitHub and end by pushin
   - removes the local repository if it exists.
   - removes the repository from the student's GitHub if it exists and the student is the owner (i.e. not a partner who is a collaborator).
 1. The script terminates if:
-  - the local repository does not exist.
-  - the remote GitHub repository does not exist.
-  - the remote GitHub repository is not owned by _GitHubUserName_
+  - not run from within the course directory.
 
 ## For Faculty
 
