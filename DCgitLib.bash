@@ -14,7 +14,7 @@
 # Copyright 2019 Grant Braught
 
 function getGitHubPassword {
-  # NOTE: This function should alwasy be called as RES=$(getGitHubPassword user pass)
+  # NOTE: This function should always be called as RES=$(getGitHubPassword user pass)
   # otherwise output will appear twice.
   local GITHUB_ID=$1
   local GITHUB_PASSWORD=$2
@@ -124,6 +124,18 @@ function deleteRepoFromGitHub {
   else
     echo false
   fi
+}
+
+function checkIfUserExistsOnGitHub {
+    local GITHUB_USER_ID=$1
+
+    local GITHUB_URL="https://api.github.com/users/"$GITHUB_USER_ID
+    local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL | tr '\"' "@" 2>&1)
+    if ! [[ $GITHUB_RESP == *"@Not Found@"* ]]; then
+      echo true
+    else
+      echo false
+    fi
 }
 
 function checkIfCollaboratorOnRepoOnGitHub {
