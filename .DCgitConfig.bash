@@ -13,7 +13,7 @@
 #
 # Copyright 2019 Grant Braught
 
-CONFIGURED=false
+CONFIGURED=true
 if ! $CONFIGURED ; then
   echo "DCgit has not been configured for this computer."
   echo "Please run DCgitConfigure.bash before using the DCgit commands."
@@ -25,6 +25,6 @@ GITHUB_COURSE_ORG="CourseOrgOnGitHub"
 INSTRUCTOR_GITHUB_ID="InstOnGitHub"
 
 # These will be rewritten by the DCgitConfig script when run by the student.
-STUDENT_GITHUB_ID=""
-STUDENT_EMAIL=""
-STUDENT_GITHUB_PASSWORD=""
+STUDENT_GITHUB_ID="braughtstu"
+STUDENT_EMAIL="braughtstu@stuff.com"
+STUDENT_GITHUB_PASSWORD="B3GvuYjczf"
