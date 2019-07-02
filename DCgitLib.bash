@@ -92,7 +92,6 @@ function getAccessibleRepoFullName {
   local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
 
   echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@.*TestAssignment@$" | cut -f4 -d'@'
-
 }
 
 function repoOwnedOnGitHub {
