@@ -27,6 +27,8 @@ sed -i .bak $SED_CMD .DCgitConfig.bash
 echo ""
 echo -n "E-mail address: "
 read ENTERED_STUDENT_EMAIL
+SED_CMD='s/STUDENT_EMAIL=".*"/STUDENT_EMAIL="'$ENTERED_STUDENT_EMAIL'"/g'
+sed -i .bak $SED_CMD .DCgitConfig.bash
 
 echo ""
 echo "DCgit can store your GitHub password on your machine."
@@ -34,7 +36,7 @@ echo "This makes it so you do not have to type it in repeatedly."
 echo "However, it is stored in plain text on your machine."
 STORE_PASSWORD="X"
 while [[ "$STORE_PASSWORD" != "y" && "$STORE_PASSWORD" != "n" ]] ; do
-  echo -n "Would you like DCgit to store your GitHub password [y/n]? "
+  echo -n "Would you like DCgit to store your GitHub password locally [y/n]? "
   read STORE_PASSWORD
 done
 if [[ $STORE_PASSWORD == "y" ]] ; then

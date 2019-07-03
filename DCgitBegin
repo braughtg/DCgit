@@ -1,0 +1,163 @@
+#!/bin/bash
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright 2019 Grant Braught
+
+if [ "$#" -eq 1 ]; then
+  ASSIGNMENT_ID=$1
+elif [ "$#" -eq 2 ]; then
+  ASSIGNMENT_ID=$1
+  PARTNER_GITHUB_ID=$2
+else
+  echo "Usage: DCgitBegin.bash AssignmentID [PartnerID]"
+  echo "  AssignmentID : The name of the assignment to begin."
+  echo "  PartnerID: The GitHub ID of your partner for this assignment."
+  exit -1
+fi
+
+# Source the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/.DCgitConfig.bash
+. $SCRIPT_DIR/DCgitLib.bash
+
+# Obtain and validate the student's GitHub password
+STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+
+# Are we running inside of the course directory?
+if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+  echo "DCgitBegin must be run from within the "$COURSE_ID" directory."
+  echo "Things to check:"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitBegin?"
+  exit -1
+fi
+
+# Does the assignment repository already exist locally?
+if [[ -d $ASSIGNMENT_ID ]] ; then
+  echo "You already have a directory for "$ASSIGNMENT_ID"."
+  echo "Things to check:"
+  echo "  Did you mean to cd "$ASSIGNMENT_ID" and then use DCgitPull?"
+  exit -1
+fi
+
+# Does the assignment repository exist in the course organization?
+if ! $(repoPublicOnGitHub $ASSIGNMENT_ID $GITHUB_COURSE_ORG) ; then
+  echo $ASSIGNMENT_ID" was not found in the course "$GITHUB_COURSE_ORG"."
+  echo "Things to check:"
+  echo "  Is the assignment name correct?"
+  exit -1
+fi
+
+# Does the assignment repository already exist in the student's GitHub account?
+if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+  echo $ASSIGNMENT_ID" already exists in your GitHub but not locally."
+  echo "Things to check:"
+  echo "  To start the assignment over again:"
+  echo "    Use DCgitExpunge"
+  echo "    Or manually remove "$ASSIGNMENT_ID" from your GitHub account."
+  echo "  To get a local copy of "$ASSIGNMENT_ID":"
+  echo "    Copy the URL of "$ASSIGNMENT_ID" from your GitHub account."
+  echo "    git clone URL"
+  exit -1
+fi
+
+# If a partner is specified, does that partner exist on GitHub?
+if [[ $PARTNER_GITHUB_ID ]] ; then
+  if ! $(checkIfUserExistsOnGitHub $PARTNER_GITHUB_ID) ; then
+    echo $PARTNER_GITHUB_ID" is not a recognized GitHub user ID."
+    echo "Thing to check:"
+    echo "  Is the GitHub ID of your partner correct?"
+    exit -1
+  fi
+fi
+
+#
+# All of the preconditions are satisfied...
+#
+
+# Copy the repo from the course into student GitHub as a private repo
+# then clone it to the student's local machine.
+echo "Beginning the assignment "$ASSIGNMENT_ID
+
+# Create an empty repository in the student's GitHub to push to...
+echo "  Creating the assignment repository in your GitHub..."
+SUCCESS=$(createNewRepoOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD true)
+if ! $SUCCESS ; then
+  echo "  There was a problem creating the assignment repository on GitHub"
+  echo "  Try again and if the problem persists check with your instructor for assistance."
+  exit -1
+fi
+
+# Add the instructor as a collaborator on the assignment...
+echo "  Adding the instructor as a collaborator on the assignment repository..."
+SUCCESS=$(addCollaboratorToRepoOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD $INSTRUCTOR_GITHUB_ID)
+if ! $SUCCESS ; then
+  echo "    There was a problem adding the instructor as a collaborator"
+  # Something went wrong so clean up...
+  SUCCESS=$(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+  if ! $SUCCESS ; then
+    echo "    Try manually removing the "$ASSIGNMENT_ID" repository from your GitHub and try again."
+  fi
+  exit -1
+fi
+
+# Add the partner as a collaborator on the assignment...
+if [[ $PARTNER_GITHUB_ID ]] ; then
+  echo "  Adding your partner as a collaborator on the assignment repository..."
+  SUCCESS=$(addCollaboratorToRepoOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD $PARTNER_GITHUB_ID)
+  if ! $SUCCESS ; then
+    echo "    There was a problem adding your partner as a collaborator"
+    # Something went wrong so clean up...
+    SUCCESS=$(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+    if ! $SUCCESS ; then
+      echo "    Try manually removing the "$ASSIGNMENT_ID" repository from your GitHub and try again."
+    fi
+    exit -1
+  fi
+fi
+
+# Clone the repo from the course org to the local machine
+echo "  Getting assignment repository content from the course GitHub..."
+GIT_URL="https://github.com/"$GITHUB_COURSE_ORG"/"$ASSIGNMENT_ID".git"
+GIT_OUT=$(git clone --bare $GIT_URL 2>&1)
+if [[ GIT_OUT == *"remote: Repository not found."* ]] ; then
+  echo "    There was a problem cloning "$ASSIGNMENT_ID" from "$GITHUB_COURSE_ORG" to the local machine."
+  # Something went wrong so clean up...
+  rm -rf $ASSIGNMENT_ID.git 2>&1 > /dev/null
+  SUCCESS=$(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+  if ! $SUCCESS ; then
+    echo "    Try manually removing the "$ASSIGNMENT_ID" repository from your GitHub and try again."
+  fi
+  exit -1
+fi
+cd $ASSIGNMENT_ID.git
+
+# Push the repo from the local machine to the student's GitHub
+echo "  Pushing the assignment repository content to your GitHub..."
+GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
+GIT_OUT=$(git push --mirror $GIT_URL 2>&1)
+
+# Get rid of the bare repo...
+cd ..
+rm -rf $ASSIGNMENT_ID.git 2>&1 > /dev/null
+
+echo "  Cloning the assignment "$ASSIGNMENT_ID" from your GitHub to the local machine."
+GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
+GIT_OUT=$(git clone $GIT_URL 2>&1)
+
+echo "Done."
+echo "The assignment "$ASSIGNMENT_ID" is now available in your GitHub and on your local machine."
+echo "  Complete the assignment using the files in the "$ASSIGNMENT_ID" directory."
+echo "  Use DCgitPush at the end of each session to copy your work to GitHub."
+echo "  Use DCgitPull at the start of each session to retrieve your most recent work."

@@ -16,25 +16,19 @@
 # Copyright 2019 Grant Braught
 
 FORCE_LOCAL=false
-if [[ "$#" -eq 1 && "$1" == "ForceLocal" ]] ; then
+if [[ "$#" -eq 2 && "$2" == "ForceLocal" ]] ; then
   FORCE_LOCAL=true
-elif [ "$#" -ne 0 ] ;  then
-  echo "Usage: DCgitPush.bash [ForceLocal]"
-  echo "  ForceLocal : [optional] forces GitHub version to look like the local version."
-  echo "               To make the local version look like the GitHub version or to"
-  echo "               combine versions use DCgitPull.bash with ForceRemote or ForceMerge"
-  echo "               to resolve conflicts and then use DCgitPush.bash."
+elif [ "$#" -ne 1 ] ;  then
+  echo "Usage: DCgitPush.bash AssignmentID [ForceLocal]"
+  echo "  AssignmentID: The assignment to be pushed to GitHub."
+  echo "    ForceLocal: [optional] forces GitHub version to look like the local version."
+  echo "                To make the local version look like the GitHub version or to"
+  echo "                combine versions use DCgitPull with ForceRemote or ManualMerge"
+  echo "                to resolve conflicts and then use DCgitPush."
   exit -1
 fi
 
-# Get the name of the current directory and confirm that it is an assignment...
-ASSIGNMENT_ID=$(basename $(pwd))
-if [ ! -f .dcgit.bash ] ; then
-  echo "DCgitPush.bash must be run from within an assignment directory."
-  echo "Things to try:"
-  echo "  Use cd to change into the assignment directory."
-  exit -1
-fi
+ASSIGNMENT_ID=$1
 
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
@@ -44,20 +38,32 @@ SCRIPT_DIR=$(dirname $0)
 # Obtain and validate the student's GitHub password
 STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
 
-# Make sure that the target repository is accessible to the student on GitHub...
-if ! $(repoAccessibleOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
-  echo "Assignment "$ASSIGNMENT_ID" is not accessible by you on GitHub."
-  echo "See your instructor for assistance in resolving this issue."
+# Are we running inside of the course directory?
+if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+  echo "DCgitPush must be run from within the "$COURSE_ID" directory."
+  echo "Things to check:"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitPush?"
+  exit -1
+fi
+
+# Is the assignment repository writeable on GitHub by the student?
+if ! $(repoWritableOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+  echo "You do not have write access to "$ASSIGNMENT_ID" on GitHub."
+  echo "  Make sure you or your partner has used DCgitBegin to start the assignment"
+  echo "  If your partner used DCgitBegin:"
+  echo "    Make sure you have accepted your partner's invitation to collaborate on "$ASSIGNMENT_ID"."
+  echo "    Make sure your partner added you as a collaborator on "$ASSIGNMENT_ID"."
   exit -1
 fi
 
 #
-# Everything looks cool so...
+# All of the preconditions are satisfied...
 #
 
-echo "Pushing "$ASSIGNMENT_ID" to git hub..."
+echo "Pushing the assignment to GitHub..."
+cd $ASSIGNMENT_ID
 
-# Confirm that there are changes to push...
+# Are there changes to be pushed?
 GIT_OUT=$(git status 2>&1)
 if [[ $GIT_OUT == *"Your branch is up to date"* && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
   echo "  There have been no changes to the local assignment. Nothing to push."
@@ -68,23 +74,23 @@ fi
 GIT_FORCE_PARAM=""
 if $FORCE_LOCAL ; then
   echo "  Request to force local version..."
-  echo "    This will overwrite any changes to the assignemnt already on GitHub with your local version."
+  echo "    This will overwrite any changes to the assignment already on GitHub with your local version."
   echo "    Work done on another machine or by a partner may be lost."
   echo -n "    Type ForceLocal to confirm: "
   read CONFIRM
   if [[ $CONFIRM == "ForceLocal" ]] ; then
     GIT_FORCE_PARAM="--force"
   else
-    echo "    ForceLocal was not entered, canceling DCgitPush.bash ForceLocal."
+    echo "    ForceLocal was not entered, canceling DCgitPush ForceLocal."
     exit -1
   fi
 fi
 
-echo "  Staging all local changes to the assignemnt..."
+echo "  Staging all local changes to the assignment..."
 # Add all of the changed files...
 GIT_OUT=$(git add --all 2>&1)
 if [[ $GIT_OUT != "" ]] ; then
-  # unstage everyting to put it back the way we found it...
+  # unstage everything to put it back the way we found it...
   git reset 2>&1 > /dev/null
   echo "    Problem staging the changed assignment."
   echo "    See your instructor for assistance."
@@ -92,8 +98,8 @@ if [[ $GIT_OUT != "" ]] ; then
 fi
 
 # Commit the changes to the local repository...
-echo "  Commiting staged changes to the local assignment..."
-COMMIT_MESSAGE=$(whoami)" used DCgitPush.bash "$GIT_FORCE_PARAM" "$(date)"."
+echo "  Committing staged changes to the local assignment..."
+COMMIT_MESSAGE=$(whoami)" used DCgitPush "$GIT_FORCE_PARAM" "$(date)"."
 GIT_OUT=$(git commit -m "$COMMIT_MESSAGE" 2>&1)
 
 # Push the local changes to the origin...
@@ -109,15 +115,15 @@ if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
   echo "    There are conflicts between changes you have made and changes already pushed to GitHub."
   echo "    Likely you or a partner pushed changes from another machine that you have not pulled."
   echo "    Things to try:"
-  echo "       Use DCgitPull.bash to update your version with the changes on GitHub."
-  echo "       Use DCGitPush.bash ForceLocal to replace the GitHub version with your version."
+  echo "       Use DCgitPull to update your local version with the changes on GitHub."
+  echo "       Use DCgitPull ForceRemote to replace your local version the GitHub version."
+  echo "       Use DCGitPush ForceLocal to replace the GitHub version with your local version."
   exit -1
 fi
 
 GIT_OUT=$(git status 2>&1)
 if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
   echo "    There was a problem pushing the changed assignment to GitHub."
-  echo "    Ensure that you have write access to the assignment."
   echo "    See your instructor for assistance."
   exit -1
 fi
