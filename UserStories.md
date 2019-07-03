@@ -131,7 +131,7 @@ Each work session should begin by pulling the work from GitHub and end by pushin
   - git config --global user.email <you@email.org>
   - git config --global push.default simple
   - git config --global credential.helper cache
-    - Note: credential.helper is not required and will make it so you don't have to repeatedly enter username and password.
+    - Note: Or any other credential.helper if you like.  It is not required but will make it so you don't have to repeatedly enter username and password.
 
 #### Creating a new Course
 1. Create a organization for the course (a new organization is recommended for each course.)

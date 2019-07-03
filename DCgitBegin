@@ -137,7 +137,9 @@ if [[ GIT_OUT == *"remote: Repository not found."* ]] ; then
   rm -rf $ASSIGNMENT_ID.git 2>&1 > /dev/null
   SUCCESS=$(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
   if ! $SUCCESS ; then
-    echo "    Try manually removing the "$ASSIGNMENT_ID" repository from your GitHub and try again."
+    echo "    Things to try:"
+    echo "      Use DCgitExpunge to remove the "$ASSIGNMENT_ID" repository and try DCgitBegin again."
+    echo "      Manually remove the "$ASSIGNMENT_ID" repository from your GitHub and try again."
   fi
   exit -1
 fi
@@ -145,7 +147,7 @@ cd $ASSIGNMENT_ID.git
 
 # Push the repo from the local machine to the student's GitHub
 echo "  Pushing the assignment repository content to your GitHub..."
-GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
+GIT_URL="https://"$STUDENT_GITHUB_ID"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
 GIT_OUT=$(git push --mirror $GIT_URL 2>&1)
 
 # Get rid of the bare repo...
@@ -153,7 +155,7 @@ cd ..
 rm -rf $ASSIGNMENT_ID.git 2>&1 > /dev/null
 
 echo "  Cloning the assignment "$ASSIGNMENT_ID" from your GitHub to the local machine."
-GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
+GIT_URL="https://"$STUDENT_GITHUB_ID"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
 GIT_OUT=$(git clone $GIT_URL 2>&1)
 
 echo "Done."

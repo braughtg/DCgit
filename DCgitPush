@@ -104,7 +104,6 @@ GIT_OUT=$(git commit -m "$COMMIT_MESSAGE" 2>&1)
 
 # Push the local changes to the origin...
 echo "  Pushing the assignment to GitHub..."
-GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
 GIT_OUT=$(git push $GIT_FORCE_PARAM origin master 2>&1)
 if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
   # Undo the last commit to put things back the way we found them...

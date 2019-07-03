@@ -189,7 +189,7 @@ else
   echo "Cloning the assignment "$ASSIGNMENT_ID" from GitHub to the local machine..."
 
   FULL_REPO_NAME=$(getAccessibleRepoFullName $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
-  GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$FULL_REPO_NAME".git"
+  GIT_URL="https://"$STUDENT_GITHUB_ID"@github.com/"$FULL_REPO_NAME".git"
   GIT_OUT=$(git clone $GIT_URL 2>&1)
   if ! [[ $GIT_OUT == *"Cloning into"* ]] ; then
     echo "  There was a problem cloning "$ASSIGNMENT_ID"."
