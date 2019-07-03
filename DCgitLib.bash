@@ -14,11 +14,17 @@
 # Copyright 2019 Grant Braught
 
 function getGitHubPassword {
-  # NOTE: This function should always be called as RES=$(getGitHubPassword user pass)
+  # NOTE: This function should always be called as RES=$(getGitHubPassword user)
   # otherwise output will appear twice.
   local GITHUB_ID=$1
-  local GITHUB_PASSWORD=$2
   local PASSWORD_SET=false
+  local GGITHUB_PASSWORD=""
+
+  # Try to retrieve the password from the git credential helper.
+  local GIT_CREDENTIAL_HELPER=$(git config --global credential.helper)
+  if [ -n "$(echo -n $GIT_CREDENTIAL_HELPER)" ] ; then
+    GITHUB_PASSWORD=$(echo -ne "username="$GITHUB_ID"\n" | git credential-$GIT_CREDENTIAL_HELPER get | cut -f2 -d'=' | tail -n1)
+  fi
 
   # Only attempt the inital login if GITHUB_PASSWORD has been set
   # This reduces number of incorrect login attempts and helps avoid rate limiting.
@@ -45,6 +51,11 @@ function getGitHubPassword {
       echo "Incorrect password for "$GITHUB_ID" please try again." > /dev/tty
     else
       PASSWORD_SET=true
+
+      # Store the password in the git credential helper.
+      if [ -n "$(echo -n $GIT_CREDENTIAL_HELPER)" ] ; then
+        echo -ne "username="$GITHUB_ID"\npassword="$GITHUB_PASSWORD"\n" | git credential-$GIT_CREDENTIAL_HELPER store
+      fi
     fi
   done
 

@@ -36,7 +36,7 @@ SCRIPT_DIR=$(dirname $0)
 . $SCRIPT_DIR/DCgitLib.bash
 
 # Obtain and validate the student's GitHub password
-STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID)
 
 # Are we running inside of the course directory?
 if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
