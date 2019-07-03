@@ -14,7 +14,7 @@
 # Copyright 2019 Grant Braught
 
 function getGitHubPassword {
-  # NOTE: This function should alwasy be called as RES=$(getGitHubPassword user pass)
+  # NOTE: This function should always be called as RES=$(getGitHubPassword user pass)
   # otherwise output will appear twice.
   local GITHUB_ID=$1
   local GITHUB_PASSWORD=$2
@@ -66,6 +66,7 @@ function repoPublicOnGitHub {
 
 function repoAccessibleOnGitHub {
   # Includes all repos public and private that are accessible by GITHUB_ID.
+  # This includes on which GITHUB_ID is a collaborator.
   # NOTE: This does not guarantee push access but a collaborator would have
   #       had to manually disable push access for a partner to make that
   #       not true.  Unlikely, but possible...
@@ -82,6 +83,17 @@ function repoAccessibleOnGitHub {
   fi
 }
 
+function getAccessibleRepoFullName {
+  local REPO_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+
+  local GITHUB_URL="https://api.github.com/user/repos"
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+
+  echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@.*"$REPO_ID".*@$" | cut -f4 -d'@'
+}
+
 function repoOwnedOnGitHub {
   # Includes all repos public and private that are owned by GITHUB_ID.
   local REPO_ID=$1
@@ -91,6 +103,23 @@ function repoOwnedOnGitHub {
   local GITHUB_URL="https://api.github.com/user/repos"
   local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD -G -d affiliation=owner | tr '\"' "@" 2>&1)
   if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]] ; then
+    echo true
+  else
+    echo false
+  fi
+}
+
+function repoWritableOnGitHub {
+  local REPO_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+
+  local FULL_REPO_NAME=$(getAccessibleRepoFullName $REPO_ID $GITHUB_ID $GITHUB_PASSWORD)
+  local GITHUB_URL="https://api.github.com/repos/"$FULL_REPO_NAME"/collaborators/"$GITHUB_ID"/permission"
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  local PERM=$( echo $GITHUB_RESP | tr ',' '\n' | grep "@permission@.*@" | cut -f4 -d'@')
+
+  if [[ $PERM == "admin" || $PERM == "write" ]] ; then
     echo true
   else
     echo false
@@ -124,6 +153,18 @@ function deleteRepoFromGitHub {
   else
     echo false
   fi
+}
+
+function checkIfUserExistsOnGitHub {
+    local GITHUB_USER_ID=$1
+
+    local GITHUB_URL="https://api.github.com/users/"$GITHUB_USER_ID
+    local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL | tr '\"' "@" 2>&1)
+    if ! [[ $GITHUB_RESP == *"@Not Found@"* ]]; then
+      echo true
+    else
+      echo false
+    fi
 }
 
 function checkIfCollaboratorOnRepoOnGitHub {

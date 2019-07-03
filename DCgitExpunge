@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright 2019 Grant Braught
+
+if [ "$#" -eq 1 ]; then
+  ASSIGNMENT_ID=$1
+else
+  echo "Usage: DCgitExpunge AssignmentID"
+  echo "  AssignmentID : The name of the assignment to be expunged."
+  exit -1
+fi
+
+# Load the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/.DCgitConfig.bash
+. $SCRIPT_DIR/DCgitLib.bash
+
+# Obtain and validate the student's GitHub password
+STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+
+# Are we running inside of the course directory?
+if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+  echo "DCgitExpunge must be run from within the "$COURSE_ID" directory."
+  echo "Things to check:"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitExpunge?"
+  exit -1
+fi
+
+#
+# All of the preconditions are satisfied...
+#
+
+echo "Expunging the assignment..."
+
+echo -n "  Retype the assignment ID to confirm: "
+read CONFIRM
+if [[ $CONFIRM == $ASSIGNMENT_ID ]] ; then
+  # Remove the repository from the student's local machine...
+  echo "  Deleting the assignment from your local machine..."
+  if [[ -d $ASSIGNMENT_ID ]] ; then
+    rm -rf $ASSIGNMENT_ID 2>&1
+    echo "  Deleted."
+  else
+    echo "    Assignment "$ASSIGNMENT_ID" not deleted from the local machine."
+    echo "    The directory was not found."
+  fi
+
+  # Remove the repository from getGitHub
+  echo "  Deleting the assignment from GitHub..."
+  if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+    if $(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+      echo "  Deleted."
+    else
+      echo "    Unable to remove "$ASSIGNMENT_ID" from GitHub. Try removing it manually."
+    fi
+  else
+    echo "    "$ASSIGNMENT_ID" not removed from GitHub, "$STUDENT_GITHUB_ID" is not the owner."
+  fi
+else
+  echo "  Expunge canceled.  Assignment ID not confirmed."
+fi
+
+echo "Done."
