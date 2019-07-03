@@ -22,18 +22,23 @@ echo ""
 echo -n "GitHub Username: "
 read ENTERED_STUDENT_GITHUB_ID
 SED_CMD='s/STUDENT_GITHUB_ID=".*"/STUDENT_GITHUB_ID="'$ENTERED_STUDENT_GITHUB_ID'"/g'
+git config --global user.name $ENTERED_STUDENT_GITHUB_ID
 sed -i .bak $SED_CMD .DCgitConfig.bash
 
 echo ""
 echo -n "E-mail address: "
 read ENTERED_STUDENT_EMAIL
 SED_CMD='s/STUDENT_EMAIL=".*"/STUDENT_EMAIL="'$ENTERED_STUDENT_EMAIL'"/g'
+git config --global user.email $ENTERED_STUDENT_EMAIL
 sed -i .bak $SED_CMD .DCgitConfig.bash
 
+# If there is no credential helper configured use the cache
+local GIT_CREDENTIAL_HELPER=$(git config --global credential.helper)
+if [ -n "$(echo -n $GIT_CREDENTIAL_HELPER)" ] ; then
+  git config --global credential.helper 'cache --timeout=43200' # 12 hours
+fi
+
 # Do the basic git configuration...
-git config --global user.name $ENTERED_STUDENT_GITHUB_ID
-git config --global user.email $ENTERED_STUDENT_EMAIL
-git config --global credential.helper 'cache --timeout=43200' # 12 hours
 git config --global push.default simple
 
 # Do the merge tool configuration...
