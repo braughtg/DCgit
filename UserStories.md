@@ -104,9 +104,11 @@ Each work session should begin by pulling the work from GitHub and end by pushin
   - there are no local changes to commit.
   - there is a problem committing changed files and _ForceLocal_ is not specified.
 
-#### Getting a Copy of Partnered Work in Your GitHub
-1. Import repository into your GitHub as a __private__ repository.
+#### Getting a Copy of Completed Partnered Work in Your Own GitHub
+1. Import repository from your partner's GitHub into your GitHub as a __private__ repository.
+  - Copy the URL of your partner's repository.
   - Choose "Import repository" under the + icon in the upper right.
+  - Provide the URL and indicate that imported repository should be private.
 
 #### Starting an Assignment Over Again
 1. Open terminal
