@@ -18,7 +18,7 @@
 if [ "$#" -eq 1 ]; then
   ASSIGNMENT_ID=$1
 else
-  echo "Usage: DCgitExpunge.bash AssignmentID"
+  echo "Usage: DCgitExpunge AssignmentID"
   echo "  AssignmentID : The name of the assignment to be expunged."
   exit -1
 fi
