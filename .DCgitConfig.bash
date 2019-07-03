@@ -13,7 +13,7 @@
 #
 # Copyright 2019 Grant Braught
 
-CONFIGURED=true
+CONFIGURED=false
 if ! $CONFIGURED ; then
   echo "DCgit has not been configured for this computer."
   echo "Please run DCgitConfigure.bash before using the DCgit commands."
