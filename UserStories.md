@@ -89,7 +89,8 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 #### Pushing an Assignment from Local Machine to GitHub:
 1. Open terminal
 1. Change to assignment directory.
-1. ../DCgitPush [_ForceLocal_]
+1. ./DCgitPush _AssignmentID_ [_ForceLocal_]
+  - _AssignmentID_ indicates the assignment to be pushed to GitHub.
   - Specify _ForceLocal_ to overwrite GitHub repository with the version from the local machine.
 1. Enter _GitHubUserName_ and _GitHubPassword_ (if not saved during configuration)
   - Ask again if failure to authenticate with GitHub
@@ -98,12 +99,10 @@ Each work session should begin by pulling the work from GitHub and end by pushin
   - Pushes the changes to the remote repository on GitHub.
     - If _ForceLocal_ is specified, the GitHub repository is forced to mirror the local repository.
 1. The script terminates if:
-  - it is not running inside of an assignment directory.
+  - it is not running inside of the course directory.
+  - the _GitHubUserName_ does not have write permission for the remote assignment repository.
   - there are no local changes to commit.
   - there is a problem committing changed files and _ForceLocal_ is not specified.
-  - the assignment repository does not exist on GitHub.
-  - the _GitHubUserName_ does not have write permission for the remote assignment repository.
-  - there is a problem pushing committed changes and _ForceLocal_ is not specified.
 
 #### Getting a Copy of Partnered Work in Your GitHub
 1. Import repository into your GitHub as a __private__ repository.
@@ -116,6 +115,7 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 1. Enter _GitHubUserName_ and _GitHubPassword_ (if not saved during configuration)
   - Ask again if failure to authenticate with GitHub
 1. The script then:
+  - confirms the assignment name.
   - removes the local repository if it exists.
   - removes the repository from the student's GitHub if it exists and the student is the owner (i.e. not a partner who is a collaborator).
 1. The script terminates if:

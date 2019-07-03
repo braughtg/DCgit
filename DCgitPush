@@ -1,0 +1,131 @@
+#!/bin/bash
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright 2019 Grant Braught
+
+FORCE_LOCAL=false
+if [[ "$#" -eq 2 && "$2" == "ForceLocal" ]] ; then
+  FORCE_LOCAL=true
+elif [ "$#" -ne 1 ] ;  then
+  echo "Usage: DCgitPush.bash AssignmentID [ForceLocal]"
+  echo "  AssignmentID: The assignment to be pushed to GitHub."
+  echo "    ForceLocal: [optional] forces GitHub version to look like the local version."
+  echo "                To make the local version look like the GitHub version or to"
+  echo "                combine versions use DCgitPull with ForceRemote or ManualMerge"
+  echo "                to resolve conflicts and then use DCgitPush."
+  exit -1
+fi
+
+ASSIGNMENT_ID=$1
+
+# Load the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/.DCgitConfig.bash
+. $SCRIPT_DIR/DCgitLib.bash
+
+# Obtain and validate the student's GitHub password
+STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+
+# Are we running inside of the course directory?
+if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+  echo "DCgitPush must be run from within the "$COURSE_ID" directory."
+  echo "Things to check:"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitPush?"
+  exit -1
+fi
+
+# Is the assignment repository writeable on GitHub by the student?
+if ! $(repoWritableOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+  echo "You do not have write access to "$ASSIGNMENT_ID" on GitHub."
+  echo "  Make sure you or your partner has used DCgitBegin to start the assignment"
+  echo "  If your partner used DCgitBegin:"
+  echo "    Make sure you have accepted your partner's invitation to collaborate on "$ASSIGNMENT_ID"."
+  echo "    Make sure your partner added you as a collaborator on "$ASSIGNMENT_ID"."
+  exit -1
+fi
+
+#
+# All of the preconditions are satisfied...
+#
+
+echo "Pushing the assignment to GitHub..."
+cd $ASSIGNMENT_ID
+
+# Are there changes to be pushed?
+GIT_OUT=$(git status 2>&1)
+if [[ $GIT_OUT == *"Your branch is up to date"* && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
+  echo "  There have been no changes to the local assignment. Nothing to push."
+  echo "Done."
+  exit 1
+fi
+
+GIT_FORCE_PARAM=""
+if $FORCE_LOCAL ; then
+  echo "  Request to force local version..."
+  echo "    This will overwrite any changes to the assignment already on GitHub with your local version."
+  echo "    Work done on another machine or by a partner may be lost."
+  echo -n "    Type ForceLocal to confirm: "
+  read CONFIRM
+  if [[ $CONFIRM == "ForceLocal" ]] ; then
+    GIT_FORCE_PARAM="--force"
+  else
+    echo "    ForceLocal was not entered, canceling DCgitPush ForceLocal."
+    exit -1
+  fi
+fi
+
+echo "  Staging all local changes to the assignment..."
+# Add all of the changed files...
+GIT_OUT=$(git add --all 2>&1)
+if [[ $GIT_OUT != "" ]] ; then
+  # unstage everything to put it back the way we found it...
+  git reset 2>&1 > /dev/null
+  echo "    Problem staging the changed assignment."
+  echo "    See your instructor for assistance."
+  exit -1
+fi
+
+# Commit the changes to the local repository...
+echo "  Committing staged changes to the local assignment..."
+COMMIT_MESSAGE=$(whoami)" used DCgitPush "$GIT_FORCE_PARAM" "$(date)"."
+GIT_OUT=$(git commit -m "$COMMIT_MESSAGE" 2>&1)
+
+# Push the local changes to the origin...
+echo "  Pushing the assignment to GitHub..."
+GIT_URL="https://"$STUDENT_GITHUB_ID":"$STUDENT_GITHUB_PASSWORD"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
+GIT_OUT=$(git push $GIT_FORCE_PARAM origin master 2>&1)
+if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
+  # Undo the last commit to put things back the way we found them...
+  git reset --soft HEAD~1 2>&1 > /dev/null
+  # Unstage everything that was staged...
+  git reset 2>&1 > /dev/null
+
+  echo "    There are conflicts between changes you have made and changes already pushed to GitHub."
+  echo "    Likely you or a partner pushed changes from another machine that you have not pulled."
+  echo "    Things to try:"
+  echo "       Use DCgitPull to update your local version with the changes on GitHub."
+  echo "       Use DCgitPull ForceRemote to replace your local version the GitHub version."
+  echo "       Use DCGitPush ForceLocal to replace the GitHub version with your local version."
+  exit -1
+fi
+
+GIT_OUT=$(git status 2>&1)
+if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
+  echo "    There was a problem pushing the changed assignment to GitHub."
+  echo "    See your instructor for assistance."
+  exit -1
+fi
+
+echo "Done."
