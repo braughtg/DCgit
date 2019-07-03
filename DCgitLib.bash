@@ -91,7 +91,7 @@ function getAccessibleRepoFullName {
   local GITHUB_URL="https://api.github.com/user/repos"
   local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
 
-  echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@.*TestAssignment@$" | cut -f4 -d'@'
+  echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@.*"$REPO_ID".*@$" | cut -f4 -d'@'
 }
 
 function repoOwnedOnGitHub {
@@ -103,6 +103,23 @@ function repoOwnedOnGitHub {
   local GITHUB_URL="https://api.github.com/user/repos"
   local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD -G -d affiliation=owner | tr '\"' "@" 2>&1)
   if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]] ; then
+    echo true
+  else
+    echo false
+  fi
+}
+
+function repoWritableOnGitHub {
+  local REPO_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+
+  local FULL_REPO_NAME=$(getAccessibleRepoFullName $REPO_ID $GITHUB_ID $GITHUB_PASSWORD)
+  local GITHUB_URL="https://api.github.com/repos/"$FULL_REPO_NAME"/collaborators/"$GITHUB_ID"/permission"
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  local PERM=$( echo $GITHUB_RESP | tr ',' '\n' | grep "@permission@.*@" | cut -f4 -d'@')
+
+  if [[ $PERM == "admin" || $PERM == "write" ]] ; then
     echo true
   else
     echo false
