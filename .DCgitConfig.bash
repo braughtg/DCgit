@@ -29,4 +29,3 @@ INSTRUCTOR_GITHUB_ID="TheInstructor"
 # These will be rewritten by the DCgitConfig script when run by the student.
 STUDENT_GITHUB_ID="TheStudent"
 STUDENT_EMAIL="student@student.stu"
-STUDENT_GITHUB_PASSWORD="studentPassword"
