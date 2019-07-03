@@ -17,7 +17,6 @@
 
 FORCE_REMOTE=false
 MANUAL_MERGE=false
-ASSIGNMENT_ID=$1
 
 if [[ "$#" -eq 2 && "$2" == "ForceRemote" ]] ; then
   FORCE_REMOTE=true
@@ -30,6 +29,8 @@ elif [ "$#" -ne 1 ] ;  then
   echo "   ManualMerge : launches a merge tool that allows you to combine versions manually."
   exit -1
 fi
+
+ASSIGNMENT_ID=$1
 
 # Load the configuration file and the library functions...
 SCRIPT_DIR=$(dirname $0)
