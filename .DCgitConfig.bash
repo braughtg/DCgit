@@ -13,7 +13,7 @@
 #
 # Copyright 2019 Grant Braught
 
-CONFIGURED=false
+CONFIGURED=true
 if ! $CONFIGURED ; then
   echo "DCgit has not been configured for this computer."
   echo "Please run DCgitConfigure.bash before using the DCgit commands."
@@ -22,10 +22,10 @@ fi
 
 # These are set by the instructor after the repo is forked.
 
-COURSE_ID="TheCourse"  # Must match the course repo name.
-GITHUB_COURSE_ORG="TheCourseOrg"
-INSTRUCTOR_GITHUB_ID="TheInstructor"
+COURSE_ID="DCgit"  # Must match the course repo name.
+GITHUB_COURSE_ORG="dickinson-comp130"
+INSTRUCTOR_GITHUB_ID="braughtg"
 
 # These will be rewritten by the DCgitConfig script when run by the student.
-STUDENT_GITHUB_ID="TheStudent"
+STUDENT_GITHUB_ID="braughtstu"
 STUDENT_EMAIL="student@student.stu"
