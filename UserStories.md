@@ -53,13 +53,13 @@ An assignment needs to be started only once, and only by one partner if the work
 A partner and the instructor are automatically added as collaboratoprs when the DCgitBegin script is used.  So using it is the easiest way to have them setup.
 
 #### Adding Instructor or Partner after Starting an Assignment:
-1. Add the instructor or partner as collaborators on the assignment repository.
+1. Maually add the instructor or partner as collaborators on the assignment repository in GitHub.
    1. Open the "Settings" tab (_gear icon_) for the repository
    1. Choose "Collaborators"
    1. Add the instructor and/or partner
 
 #### Removing a Partner from an Assignment:
-1. Remove the partner as collaborators on the assignment repository.
+1. Manualy remove the partner as a collaborator on the assignment repository in GitHub.
    1. Open the "Settings" tab (_gear icon_) for the repository
    1. Choose "Collaborators"
    1. Click the "X" next to partner's ID
@@ -95,8 +95,8 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 1. Enter _GitHubUserName_ and _GitHubPassword_ (if not saved during configuration)
    - Ask again if failure to authenticate with GitHub
 1. The script then:
-   - Commits all changed files to the local repository
-   - Pushes the changes to the remote repository on GitHub.
+   1. Commits all changed files to the local repository
+   1. Pushes the changes to the remote repository on GitHub.
       - If _ForceLocal_ is specified, the GitHub repository is forced to mirror the local repository.
 1. The script terminates if:
    - it is not running inside of the course directory.
@@ -106,9 +106,9 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 
 #### Getting a Copy of Completed Partnered Work in Your Own GitHub
 1. Import repository from your partner's GitHub into your GitHub as a __private__ repository.
-   - Copy the URL of your partner's repository.
-   - Choose "Import repository" under the + icon in the upper right.
-   - Provide the URL and indicate that imported repository should be private.
+   1. Copy the URL of your partner's repository.
+   1. Choose "Import repository" under the + icon in the upper right.
+   1. Provide the URL and indicate that imported repository should be private.
 
 #### Starting an Assignment Over Again
 1. Open terminal
@@ -146,7 +146,7 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 1. Create assignments.
 
 #### Creating an Assignment
-1.  Create a repository in the course organization for the assignment.
+1. Create a repository in the course organization for the assignment.
    - Use DCgitAssignmentTemplate as a template to get the default licenses pre-configured in the README.md.
 1. Clone the assignment repository.
 1. Add instructions, files and resources as necessary.
