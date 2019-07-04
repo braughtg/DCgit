@@ -7,16 +7,16 @@ The assignments in this course are distributed, collected and returned using DCg
 
 1. Create a GitHub account
 1. Once on each machine you use:
-  1. `git clone CourseURL`
-  1. `cd CourseName`
-  1. `./DCgitConfigure`
+   1. `git clone CourseURL`
+   1. `cd CourseName`
+   1. `./DCgitConfigure`
 1. Once for each assignment:
-  1. `./DCgitBegin AssignmentID [PartnerID]`
+   1. `./DCgitBegin AssignmentID [PartnerID]`
 1. Each work session:
-  1. `cd CourseName`
-  1. `./DCgitPull AssignmentID`
-  1. Work on the assignment.
-  1. `./DCgitPush AssignmentID`
+   1. `cd CourseName`
+   1. `./DCgitPull AssignmentID`
+   1. Work on the assignment.
+   1. `./DCgitPush AssignmentID`
 
 ___
 ![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")
