@@ -23,7 +23,7 @@ function getGitHubPassword {
   # Try to retrieve the password from the git credential helper.
   local GIT_CREDENTIAL_HELPER=$(git config --global credential.helper)
   if [ -n "$(echo -n $GIT_CREDENTIAL_HELPER)" ] ; then
-    GITHUB_PASSWORD=$(echo -ne "username="$GITHUB_ID"\n" | git credential-$GIT_CREDENTIAL_HELPER get | cut -f2 -d'=' | tail -n1)
+    GITHUB_PASSWORD=$(echo -ne "username="$GITHUB_ID"\n" | git credential-$GIT_CREDENTIAL_HELPER get | grep "^password" | cut -f2 -d'=' | tail -n1)
   fi
 
   # Only attempt the inital login if GITHUB_PASSWORD has been set
