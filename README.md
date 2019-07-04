@@ -6,23 +6,17 @@ Information about the specific course goes here.
 The assignments in this course are distributed, collected and returned using DCgit. The basic process for completing the assignments is as follows:
 
 1. Create a GitHub account
-* From the command line on your machine:
-  1. `git clone [URL copied from Clone or Download Button]`
-  * `cd [CourseName]`
-  * `./DCgitConfigure.bash`
-* Once for each assignment:
-  * `./DCgitBegin.bash [AssignmentName]`
-* Anytime working on a new machine:
-  * If an individual assignment or you are first partner:
-    * `./DCgitClone.bash [AssignmentName]`
-  * If a paired assignment and you are the second partner:
-    * `./DCgitPartnerClone.bash [AssignmentName] [PartnerGitHubID]`
-* Each work session:
-  1. `cd [CourseName]`
-  * `cd [AssignmentName]`
-  * `../DCgitPull.bash`
-  * Work on the assignment in an editor.
-  * `../DCgitPush.bash`
+1. Once on each machine you use:
+   1. `git clone CourseURL`
+   1. `cd CourseName`
+   1. `./DCgitConfigure`
+1. Once for each assignment:
+   1. `./DCgitBegin AssignmentID [PartnerID]`
+1. Each work session:
+   1. `cd CourseName`
+   1. `./DCgitPull AssignmentID`
+   1. Work on the assignment.
+   1. `./DCgitPush AssignmentID`
 
 ___
 ![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")
