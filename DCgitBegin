@@ -21,7 +21,7 @@ elif [ "$#" -eq 2 ]; then
   ASSIGNMENT_ID=$1
   PARTNER_GITHUB_ID=$2
 else
-  echo "Usage: DCgitBegin.bash AssignmentID [PartnerID]"
+  echo "Usage: DCgitBegin AssignmentID [PartnerID]"
   echo "  AssignmentID : The name of the assignment to begin."
   echo "  PartnerID: The GitHub ID of your partner for this assignment."
   exit -1

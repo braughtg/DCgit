@@ -19,7 +19,7 @@ FORCE_LOCAL=false
 if [[ "$#" -eq 2 && "$2" == "ForceLocal" ]] ; then
   FORCE_LOCAL=true
 elif [ "$#" -ne 1 ] ;  then
-  echo "Usage: DCgitPush.bash AssignmentID [ForceLocal]"
+  echo "Usage: DCgitPush AssignmentID [ForceLocal]"
   echo "  AssignmentID: The assignment to be pushed to GitHub."
   echo "    ForceLocal: [optional] forces GitHub version to look like the local version."
   echo "                To make the local version look like the GitHub version or to"
