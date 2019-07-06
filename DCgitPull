@@ -189,10 +189,22 @@ else
   echo "Cloning the assignment "$ASSIGNMENT_ID" from GitHub to the local machine..."
 
   FULL_REPO_NAME=$(getAccessibleRepoFullName $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
+
+  # Give a choice if there is more than one repo accessible...
+  if [[ $(echo $FULL_REPO_NAME | wc -w) -gt 1 ]] ; then
+    echo "  More than one repository avaialble.  Please choose one."
+    select REPO in $FULL_REPO_NAME;
+    do
+      FULL_REPO_NAME=$REPO
+      echo "  Cloning "$FULL_REPO_NAME"..."
+      break
+    done
+  fi
+
   GIT_URL="https://"$STUDENT_GITHUB_ID"@github.com/"$FULL_REPO_NAME".git"
   GIT_OUT=$(git clone $GIT_URL 2>&1)
   if ! [[ $GIT_OUT == *"Cloning into"* ]] ; then
-    echo "  There was a problem cloning "$ASSIGNMENT_ID"."
+    echo "  There was a problem cloning "$FULL_REPO_NAME"."
   fi
 fi
 
