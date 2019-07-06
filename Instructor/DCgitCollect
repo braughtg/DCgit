@@ -1,0 +1,137 @@
+#!/bin/bash
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright 2019 Grant Braught
+
+function printUsage {
+  echo "Usage: DCgitCollect AssignmentID -L StudentList | -S StudentID [Replace]"
+  echo "  AssignmentID : The name of the assignment to collect."
+  echo "  -L StudentList | -S StudentID:"
+  echo "    -L StudentList: A file containing the list of GitHub IDs of the students."
+  echo "    -S StudentID: A single student GitHub ID."
+  echo "  Replace: Include to replace (delete and reclone) all collected repositories and add any newly available ones"
+  echo "           Omit to skip repositories already collected and add any newly available ones."
+}
+
+if [[ "$#" -lt 3 ]] ; then
+  printUsage
+  exit -1
+elif [[ "$#" -eq 4 && "$4" != "Replace" ]] ; then
+  printUsage
+  exit -1
+elif [[ "$2" != "-L" && "$2" != "-S" ]] ; then
+  printUsage
+  exit -1
+fi
+
+ASSIGNMENT_ID=$1
+
+# Get the list of students...
+if [[ $2 == "-L" ]]; then
+  STU_LIST_FILE=$(echo $3 | cut -d' ' -f 2)
+  if [[ -f $STU_LIST_FILE ]] ; then
+    # ignore comments and blank lines.
+    STUDENT_LIST=$(cat $STU_LIST_FILE | grep -v '^#' | cut -f1 -d'#')
+  else
+    echo "Student list "$STU_LIST_FILE" could not be read."
+    exit -1
+  fi
+else
+  STU_ID=$(echo $3 | cut -d' ' -f 2)
+  STUDENT_LIST=$STU_ID
+fi
+
+REPLACE=false
+if [[ "$#" -eq 4 ]] ; then
+  REPLACE=true
+fi
+
+# Source the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/../.DCgitConfig.bash
+. $SCRIPT_DIR/../DCgitLib.bash
+
+# Obtain and validate the instructor's GitHub password
+INSTRUCTOR_GITHUB_PASSWORD=$(getGitHubPassword $INSTRUCTOR_GITHUB_ID)
+
+echo "Collecting "$ASSIGNMENT_ID"..."
+
+# Make the directory where the submissions will be stored.
+if [[ ! -d $ASSIGNMENT_ID".submissions" ]] ; then
+  echo "  Making submissions directory..."
+  mkdir $ASSIGNMENT_ID".submissions"
+fi
+
+# Process each of the students cloning the owned repositories...
+echo "  Processing students..."
+for STUDENT in $STUDENT_LIST
+do
+  echo "    Working on "$STUDENT...
+
+  if ! $(checkIfUserExistsOnGitHub $STUDENT) ; then
+    echo "      "$STUDENT" was not found on GitHub."
+    echo "      Skipping."
+    continue
+  fi
+
+  # Only clone from the owner... use collaborators in directory names...
+  if $(isRepoOwnerOnGitHub $ASSIGNMENT_ID $STUDENT $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD) ; then
+    echo "      "$STUDENT" owns "$ASSIGNMENT_ID"."
+    echo "      Getting collaborators..."
+
+    COLLABORATORS=$(getCollaboratorsOnGitHub $ASSIGNMENT_ID $STUDENT $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD)
+    DIR_NAME=$STUDENT
+    for COLLAB in $COLLABORATORS
+    do
+      if [[ "$COLLAB" != "$STUDENT" && "$COLLAB" != $INSTRUCTOR_GITHUB_ID ]] ; then
+        DIR_NAME=$DIR_NAME"."$COLLAB
+      fi
+    done
+
+    DIR_PATH=$ASSIGNMENT_ID".submissions/"$DIR_NAME
+    if $REPLACE ; then
+      echo "      Removing previously collected repository "$DIR_PATH
+      rm -rf $DIR_PATH 2>&1 > /dev/null
+    fi
+
+    if [[ ! -d $DIR_PATH ]] ; then
+      echo "      Creating directory "$DIR_PATH"..."
+      mkdir $DIR_PATH
+
+      echo "      Cloning "$ASSIGNMENT_ID" to "$DIR_NAME"..."
+      GIT_URL="https://"$INSTRUCTOR_GITHUB_ID"@github.com/"$STUDENT"/"$ASSIGNMENT_ID".git"
+      GIT_OUT=$(git -C $DIR_PATH clone $GIT_URL 2>&1)
+
+      REPO_PATH=$DIR_PATH"/"$ASSIGNMENT_ID
+      GIT_OUT=$(git -C $REPO_PATH status 2>&1)
+      if [[ $GIT_OUT == *"Your branch is up to date"* ]] ; then
+        echo "      Repository cloned."
+      else
+        echo "      REPOSITORY NOT CLONED!"
+      fi
+
+    else
+      echo "      Repository already collected for "$DIR_NAME"."
+      echo "      Skipping."
+    fi
+
+  else
+    echo "      "$STUDENT" does not own "$ASSIGNMENT_ID"."
+    echo "      Skipping."
+  fi
+
+done
+
+echo "Done."

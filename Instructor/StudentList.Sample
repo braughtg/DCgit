@@ -1,0 +1,12 @@
+# Comment lines start with #
+# Students are listed one per line.
+Student1
+StudentTwo
+# Blank lines are ignored
+
+StudentTres  # end of line comments are okay.
+Student4
+braughtstu
+braught-stu2
+braughtg
+Etc

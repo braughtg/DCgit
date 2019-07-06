@@ -95,6 +95,9 @@ function repoAccessibleOnGitHub {
 }
 
 function getAccessibleRepoFullName {
+  # NOTE: Will return multiple repo names if more than one repo with the
+  #       requested name is accessible to GIT_HUB_ID (e.g. thorugh mulitple
+  #       collaborations.)
   local REPO_ID=$1
   local GITHUB_ID=$2
   local GITHUB_PASSWORD=$3
@@ -102,7 +105,7 @@ function getAccessibleRepoFullName {
   local GITHUB_URL="https://api.github.com/user/repos"
   local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
 
-  echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@.*"$REPO_ID".*@$" | cut -f4 -d'@'
+  echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@:.*"$REPO_ID".*@$" | cut -f4 -d'@'
 }
 
 function repoOwnedOnGitHub {
@@ -117,6 +120,24 @@ function repoOwnedOnGitHub {
     echo true
   else
     echo false
+  fi
+}
+
+function isRepoOwnerOnGitHub {
+  # Includes all repos public and private that are accessible by CHECKER_GITHUB_ID.
+  local REPO_ID=$1
+  local OWNER_GITHUB_ID=$2
+  local CHECKER_GITHUB_ID=$3
+  local CHECKER_GITHUB_PASSWORD=$4
+
+  local GITHUB_URL="https://api.github.com/user/repos"
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $CHECKER_GITHUB_ID:$CHECKER_GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  local REPO_FULL_NAME=$( echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@: @"$OWNER_GITHUB_ID"/"$REPO_ID".*@$" | cut -f4 -d'@')
+
+  if [[ $REPO_FULL_NAME == "" ]] ; then
+    echo false
+  else
+    echo true
   fi
 }
 
@@ -206,6 +227,19 @@ function removeCollaboratorFromRepoOnGitHub {
   else
     echo false
   fi
+}
+
+function getCollaboratorsOnGitHub {
+  local REPO_ID=$1
+  local OWNER_GITHUB_ID=$2
+  local CHECKER_GITHUB_ID=$3
+  local CHECKER_GITHUB_PASSWORD=$4
+
+  local GITHUB_URL="https://api.github.com/repos/"$OWNER_GITHUB_ID"/"$REPO_ID"/collaborators"
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u "$CHECKER_GITHUB_ID:$CHECKER_GITHUB_PASSWORD" 2>&1)
+
+  local COLLABORATORS=$(echo $GITHUB_RESP | tr '/"' '@' | tr ',' '\n' | grep "@login@:" | cut -d '@' -f4)
+  echo $COLLABORATORS
 }
 
 function addCollaboratorToRepoOnGitHub {

@@ -19,7 +19,7 @@ An assignment needs to be started only once, and only by one partner if the work
 #### Using the Scripts:
 1. Open terminal
 1. Change to course directory.
-1. ./DCgitBegin _AssignmentID_ [_PartnerID_]
+1. ./DCgitBegin _AssignmentID_ [ _PartnerID_ ]
    - Provide _PartnerID_ for paired work, omit for individual work.
 1. Enter _GitHubUserName_ and _GitHubPassword_ (if not saved during configuration.)
    - Ask again if failure to authenticate with GitHub
@@ -89,7 +89,7 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 #### Pushing an Assignment from Local Machine to GitHub:
 1. Open terminal
 1. Change to assignment directory.
-1. ./DCgitPush _AssignmentID_ [_ForceLocal_]
+1. ./DCgitPush _AssignmentID_ [ _ForceLocal_ ]
    - _AssignmentID_ indicates the assignment to be pushed to GitHub.
    - Specify _ForceLocal_ to overwrite GitHub repository with the version from the local machine.
 1. Enter _GitHubUserName_ and _GitHubPassword_ (if not saved during configuration)
@@ -155,14 +155,28 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 #### Collecting an Assignment
 1. Open terminal
 1. Change to course directory
-1. ./Instructor/DCgitCollect _AssignmentID_ _StudentList_
+1. ./Instructor/DCgitCollect _AssignmentID_ -L _StudentList_ | -S _StudentID_ [ _Replace_ ]
+   - -L _StudentList_ | -S _StudentID_
+      - -L StudentList - provide a list of students. See the _StudentList.sample_ file in the Instructor directory.
+      - -S StudentID - provide the GitHub ID of a single student.
+   - Replace:
+      - Include to replace already collected assignment repositories.
+      - Omit to only collect a repository if it has not already been collected.
 1. The script then:
-   - reads the _StudentList_ file from the Instructor directory.
-      - See the _StudentList.sample_ file in the Instructor directory.
-   - Clones each of the student repositories into a directory named _AssignmentID_.submissions in the course directory.
-1. Mark and comment on the files in the student repositories.
+   - Reads the _StudentList_ file, if specified, from the Instructor directory.
+   - creates an _AssignmentID_.submissions directory within the Instructor directory.
+     - if the directory exists it is left in place.
+   - for each student in the list:
+     - if an _AssignmentID_ repository is __owned__ on GitHub by the student:
+         - gets a list of the collaborators on the repository.
+         - if _Replace_ is used remove the prior submission.
+         - creates a directory for the student and collaborators in the _AssignmentID_.submissions directory.
+            - the directory is named using a period delimited concatenation of the student collaborators' GitHub IDs.
+         - clone's the repository into the directory
+1. Mark and comment on the files in the cloned repositories.
+1. Use the DCgitReturn script to push marked assignments back to the students.
 1. The script terminates if:
-   - There is not a readable _StudentList_ file in the Instructor directory.
+   - The _StudentList_ file is not readable.
 
 #### Returning an Assignment
 1. Open terminal
