@@ -38,6 +38,15 @@ fi
 
 ASSIGNMENT_ID=$1
 
+# Are we running inside of the course and instructor directory?
+if [[ "${PWD##*/}" != "Instructor" ]] ; then
+  cd ..
+  if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+    echo "DCgitCollect must be run from within the "$COURSE_ID"/Instructor directory."
+    exit -1
+  fi
+fi
+
 # Get the list of students...
 if [[ $2 == "-L" ]]; then
   STU_LIST_FILE=$(echo $3 | cut -d' ' -f 2)
