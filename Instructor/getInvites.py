@@ -26,4 +26,4 @@ for invite in obj:
      invite['invitee']['login'] == invitee and \
      invite['inviter']['login'] == inviter:
 
-     print str(invite['id'])
+     print(str(invite['id']))

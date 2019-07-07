@@ -152,10 +152,29 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 1. Add instructions, files and resources as necessary.
 1. Commit and push the changes.
 
+#### Checking/Accepting Collaboration Invitations
+1. Open terminal
+1. Change to Instructor directory for the course.
+1. ./DCgitCheck _AssignmentID_ -L _StudentList_ | -S _StudentID_
+   - -L _StudentList_ | -S _StudentID_
+      - -L StudentList - provide a list of students. See the _StudentList.sample_ file in the Instructor directory.
+      - -S StudentID - provide the GitHub ID of a single student.
+1. The script then:
+   - Reads the _StudentList_ file, if specified, from the Instructor directory.
+   - Get all current invitations to collaborate
+   - Accept all invitations to the assignment from students in the list.
+   - Report lists of
+      - Students and their collaborators.
+      - Students not active on the assignment (i.e. not an owner and not a collaborator).
+      - Students active more than once on the assignment.
+1. The script terminates if:
+   - not run from the _CourseID_/Instructor directory.
+   - the _StudentList_ file is not readable.
+
 #### Collecting an Assignment
 1. Open terminal
-1. Change to course directory
-1. ./Instructor/DCgitCollect _AssignmentID_ -L _StudentList_ | -S _StudentID_ [ _Replace_ ]
+1. Change to Instructor directory for the course.
+1. ./DCgitCollect _AssignmentID_ -L _StudentList_ | -S _StudentID_ [ _Replace_ ]
    - -L _StudentList_ | -S _StudentID_
       - -L StudentList - provide a list of students. See the _StudentList.sample_ file in the Instructor directory.
       - -S StudentID - provide the GitHub ID of a single student.
@@ -176,16 +195,26 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 1. Mark and comment on the files in the cloned repositories.
 1. Use the DCgitReturn script to push marked assignments back to the students.
 1. The script terminates if:
-   - The _StudentList_ file is not readable.
+   - not run from the _CourseID_/Instructor directory.
+   - the _StudentList_ file is not readable.
 
 #### Returning an Assignment
 1. Open terminal
-1. Change to the assignment directory
-1. ./Instructor/DCgitReturn _AssignmentID_
+1. Change to the Instructor directory for the course.
+1. ./DCgitReturn _AssignmentID_ -L _StudentList_ | -S _StudentID_
+   - -L _StudentList_ | -S _StudentID_
+      - -L StudentList - provide a list of students. See the _StudentList.sample_ file in the Instructor directory.
+      - -S StudentID - provide the GitHub ID of a single student.
 1. The script then:
-   - Commits and pushes all changes to all repositories in the _AssignmentID_.submissions directory.
+   - Commits and pushes all changes to all indicated repositories.
 1. The script terminates if:
-   - There is no _AssignmentID_.submissions directory.
+   - not run from the _CourseID_/Instructor directory.
+   - the _StudentList_ file is not readable.
+   - there is no _AssignmentID_.submissions directory.
+
+#### Closing a Course
+NEED TO DROP SELF AS A COLLABORATOR FROM ALL REPOS IN THE COURSE
+
 
   ___
   ![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")

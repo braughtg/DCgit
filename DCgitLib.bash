@@ -77,7 +77,7 @@ function repoPublicOnGitHub {
 
 function repoAccessibleOnGitHub {
   # Includes all repos public and private that are accessible by GITHUB_ID.
-  # This includes on which GITHUB_ID is a collaborator.
+  # This includes those on which GITHUB_ID is a collaborator.
   # NOTE: This does not guarantee push access but a collaborator would have
   #       had to manually disable push access for a partner to make that
   #       not true.  Unlikely, but possible...
@@ -125,6 +125,7 @@ function repoOwnedOnGitHub {
 
 function isRepoOwnerOnGitHub {
   # Includes all repos public and private that are accessible by CHECKER_GITHUB_ID.
+  # This can be slow because instructor will be collaborator on lots of repos.
   local REPO_ID=$1
   local OWNER_GITHUB_ID=$2
   local CHECKER_GITHUB_ID=$3
@@ -132,12 +133,11 @@ function isRepoOwnerOnGitHub {
 
   local GITHUB_URL="https://api.github.com/user/repos"
   local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $CHECKER_GITHUB_ID:$CHECKER_GITHUB_PASSWORD | tr '\"' "@" 2>&1)
-  local REPO_FULL_NAME=$( echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@: @"$OWNER_GITHUB_ID"/"$REPO_ID".*@$" | cut -f4 -d'@')
-
-  if [[ $REPO_FULL_NAME == "" ]] ; then
-    echo false
-  else
+  MATCH="@full_name@: @"$OWNER_GITHUB_ID"/"$REPO_ID"@"
+  if [[ $GITHUB_RESP == *"$MATCH"* ]] ; then
     echo true
+  else
+    echo false
   fi
 }
 
@@ -258,25 +258,16 @@ function addCollaboratorToRepoOnGitHub {
 }
 
 function acceptCollborationInviteOnGitHub {
-  local REPO_ID=$1
-  local COLLABORATOR_ID=$2
-  local GITHUB_ID=$3
-  local GITHUB_PASSWORD=$4
+  local INVITATION_ID=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
 
-  # Get the invitation id from GitHub...
-  local GITHUB_URL="https://api.github.com/user/repository_invitations"
-  local GITHUB_RESP=$(curl -s -S $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" 2>&1)
-  INVITATION_ID=$(echo $GITHUB_RESP | python getInvites.py $REPO_ID $GITHUB_ID $COLLABORATOR_ID)
-  if [[ "$INVITATION_ID" == "" ]] ; then
-    echo false
+  # Accept the invitation...
+  local GITHUB_URL="https://api.github.com/user/repository_invitations/$INVITATION_ID"
+  local GITHUB_RESP=$(curl -s -S -X PATCH $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" 2>&1)
+  if [[ "$GITHUB_RESP" == "" ]]; then
+    echo true
   else
-    # Accept the invitation...
-    local GITHUB_URL="https://api.github.com/user/repository_invitations/$INVITATION_ID"
-    local GITHUB_RESP=$(curl -s -S -X PATCH $GITHUB_URL -u "$GITHUB_ID:$GITHUB_PASSWORD" 2>&1)
-    if [[ "$GITHUB_RESP" == "" ]]; then
-      echo true
-    else
-      echo false
-    fi
+    echo false
   fi
 }

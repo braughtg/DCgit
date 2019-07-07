@@ -1,0 +1,147 @@
+#!/bin/bash
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright 2019 Grant Braught
+
+function printUsage {
+  echo "Usage: DCgitCheck AssignmentID -L StudentList | -S StudentID"
+  echo "  AssignmentID : The name of the assignment to collect."
+  echo "  -L StudentList | -S StudentID:"
+  echo "    -L StudentList: A file containing the list of GitHub IDs of the students."
+  echo "    -S StudentID: A single student GitHub ID."
+}
+
+if [[ "$#" -lt 3 ]] ; then
+  printUsage
+  exit -1
+elif [[ "$2" != "-L" && "$2" != "-S" ]] ; then
+  printUsage
+  exit -1
+fi
+
+ASSIGNMENT_ID=$1
+
+# Are we running inside of the course and instructor directory?
+if [[ "${PWD##*/}" != "Instructor" ]] ; then
+  cd ..
+  if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+    echo "DCgitCheck must be run from within the "$COURSE_ID"/Instructor directory."
+    exit -1
+  fi
+fi
+
+# Get the list of students...
+if [[ $2 == "-L" ]]; then
+  STU_LIST_FILE=$(echo $3 | cut -d' ' -f 2)
+  if [[ -f $STU_LIST_FILE ]] ; then
+    # ignore comments and blank lines.
+    STUDENT_LIST=$(cat $STU_LIST_FILE | grep -v '^#' | cut -f1 -d'#')
+  else
+    echo "Student list "$STU_LIST_FILE" could not be read."
+    exit -1
+  fi
+else
+  STU_ID=$(echo $3 | cut -d' ' -f 2)
+  STUDENT_LIST=$STU_ID
+fi
+
+# Source the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/../.DCgitConfig.bash
+. $SCRIPT_DIR/../DCgitLib.bash
+
+# Obtain and validate the instructor's GitHub password
+INSTRUCTOR_GITHUB_PASSWORD=$(getGitHubPassword $INSTRUCTOR_GITHUB_ID)
+
+echo "Checking on "$ASSIGNMENT_ID"..."
+
+echo "  Accepting pending invitations to "$ASSIGNMENT_ID"..."
+GITHUB_URL="https://api.github.com/user/repository_invitations"
+GITHUB_RESP=$(curl -s -S $GITHUB_URL -u "$INSTRUCTOR_GITHUB_ID:$INSTRUCTOR_GITHUB_PASSWORD" 2>&1)
+COUNT=0
+for STU in $STUDENT_LIST
+do
+  INVITATION_IDS=$(echo $GITHUB_RESP | python3 getInvites.py $ASSIGNMENT_ID $INSTRUCTOR_GITHUB_ID $STU)
+  for INVITE in $INVITATION_IDS
+  do
+    COUNT=$((COUNT+1))
+    RES=$(acceptCollborationInviteOnGitHub $INVITE $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD)
+    if $RES ; then
+      echo "    Accepted invitation from "$STU"."
+    else
+      echo "    FAILED TO ACCEPT INVITATION FROM "$STU"."
+    fi
+  done
+done
+if [[ $COUNT -eq 0 ]] ; then
+  echo "    No invitations to accept."
+fi
+
+echo "  The students and their collaborators are..."
+# build lists of all students and collaborators and anyone seen more than once.
+STU_SEEN=""
+STU_SEEN_AGAIN=""
+
+# Cache the list of repositories on which the instructor is a collaborator.
+# Probably going to need to deal with pages here because it will get long!!!!!
+GITHUB_URL="https://api.github.com/user/repos"
+INST_COLLAB_REPOS=$(curl -s -S -X GET $GITHUB_URL -u $INSTRUCTOR_GITHUB_ID:$INSTRUCTOR_GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+
+for STU in $STUDENT_LIST
+do
+  # does the student own the repo?
+  MATCH="@full_name@: @"$STU"/"$ASSIGNMENT_ID"@"
+  if [[ $INST_COLLAB_REPOS == *"$MATCH"* ]] ; then
+    LINE=$STU
+
+    if [[ ! $STU_SEEN == *" $STU "* ]] ; then
+      STU_SEEN=" "$STU" "$STU_SEEN
+    elif [[ ! $STU_SEEN_AGAIN == *" $STU "* ]] ; then
+      STU_SEEN_AGAIN=" "$STU" "$STU_SEEN_AGAIN
+    fi
+
+    COLLABORATORS=$(getCollaboratorsOnGitHub $ASSIGNMENT_ID $STU $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD)
+    for COLLAB in $COLLABORATORS
+    do
+      if [[ "$COLLAB" != "$STU" && "$COLLAB" != "$INSTRUCTOR_GITHUB_ID" ]] ; then
+        LINE=$LINE" : "$COLLAB
+
+        if [[ ! $STU_SEEN == *" $COLLAB "* ]] ; then
+          STU_SEEN=" "$COLLAB" "$STU_SEEN
+        elif [[ ! $STU_SEEN_AGAIN == *" $COLLAB "* ]] ; then
+          STU_SEEN_AGAIN=" "$COLLAB" "$STU_SEEN_AGAIN
+        fi
+      fi
+    done
+
+    echo "    "$LINE
+  fi
+done
+
+echo "  Students not seen were:"
+for STU in $STUDENT_LIST
+do
+  if [[ ! $STU_SEEN == *" $STU "* ]] ; then
+    echo "    "$STU
+  fi
+done
+
+echo "  Students seen twice were:"
+for STU in $STU_SEEN_AGAIN
+do
+  echo "    "$STU
+done
+
+echo "Done."
