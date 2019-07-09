@@ -62,12 +62,43 @@ function getGitHubPassword {
   echo $GITHUB_PASSWORD
 }
 
+function readGitHubAPIPagedResult {
+  local GITHUB_URL=$1
+  local GITHUB_ID=$2
+  local GITHUB_PASSWORD=$3
+  local API_PARAMS=$4
+
+  local NEXT_PAGE_URL=$GITHUB_URL"?page=1&per_page=100"
+
+  # Get the number of pages...
+  local GITHUB_RESP=$(curl -I -s -S -X GET $NEXT_PAGE_URL -u $GITHUB_ID:$GITHUB_PASSWORD $API_PARAMS)
+  local NUM_PAGES=$(echo $GITHUB_RESP | tr ',' '\n' | grep "<https://.*rel=\"last\"" | cut -d'=' -f2 | cut -d'&' -f1)
+  # NOTE: NUM_PAGES is empty if only one page.
+
+  # Get each of the pages...
+  local PAGES=""
+  RANGE=$(seq 1 $NUM_PAGES)  # NOTE: seq gives 1 if NUM_PAGES is empty.
+  for i in $RANGE
+  do
+    # Get the page data...
+    local PAGE=$(curl -s -S -X GET $NEXT_PAGE_URL -u $GITHUB_ID:$GITHUB_PASSWORD 2>&1)
+    PAGES=$PAGES" "$PAGE
+
+    # Get the next page URL...
+    GITHUB_RESP=$(curl -I -s -S -X GET $NEXT_PAGE_URL -u $GITHUB_ID:$GITHUB_PASSWORD)
+    NEXT_PAGE_URL=$(echo $GITHUB_RESP | tr ',' '\n' | grep "<https://.*rel=\"next\"" | cut -d'<' -f2 | cut -d'>' -f1)
+  done
+
+  echo $PAGES
+}
+
+
 function repoPublicOnGitHub {
   local REPO_ID=$1
   local GITHUB_ID=$2
 
   local GITHUB_URL="https://api.github.com/users/"$GITHUB_ID"/repos"
-  local GITHUB_RESP=$(curl -s -S $GITHUB_URL | tr '\"' "@" 2>&1)
+  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL | tr '\"' '@')
   if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]]; then
     echo true
   else
@@ -86,7 +117,7 @@ function repoAccessibleOnGitHub {
   local GITHUB_PASSWORD=$3
 
   local GITHUB_URL="https://api.github.com/user/repos"
-  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $GITHUB_ID $GITHUB_PASSWORD | tr '\"' '@')
   if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]] ; then
     echo true
   else
@@ -103,7 +134,7 @@ function getAccessibleRepoFullName {
   local GITHUB_PASSWORD=$3
 
   local GITHUB_URL="https://api.github.com/user/repos"
-  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $GITHUB_ID $GITHUB_PASSWORD | tr '\"' '@')
 
   echo $GITHUB_RESP | tr ',' '\n' | grep "^ @full_name@:.*"$REPO_ID".*@$" | cut -f4 -d'@'
 }
@@ -115,7 +146,7 @@ function repoOwnedOnGitHub {
   local GITHUB_PASSWORD=$3
 
   local GITHUB_URL="https://api.github.com/user/repos"
-  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD -G -d affiliation=owner | tr '\"' "@" 2>&1)
+  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $GITHUB_ID $GITHUB_PASSWORD "-G -d affiliation=owner" | tr '\"' '@')
   if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]] ; then
     echo true
   else
@@ -132,7 +163,7 @@ function isRepoOwnerOnGitHub {
   local CHECKER_GITHUB_PASSWORD=$4
 
   local GITHUB_URL="https://api.github.com/user/repos"
-  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $CHECKER_GITHUB_ID:$CHECKER_GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $CHECKER_GITHUB_ID $CHECKER_GITHUB_PASSWORD | tr '\"' '@')
   MATCH="@full_name@: @"$OWNER_GITHUB_ID"/"$REPO_ID"@"
   if [[ $GITHUB_RESP == *"$MATCH"* ]] ; then
     echo true
@@ -236,7 +267,7 @@ function getCollaboratorsOnGitHub {
   local CHECKER_GITHUB_PASSWORD=$4
 
   local GITHUB_URL="https://api.github.com/repos/"$OWNER_GITHUB_ID"/"$REPO_ID"/collaborators"
-  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u "$CHECKER_GITHUB_ID:$CHECKER_GITHUB_PASSWORD" 2>&1)
+  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $CHECKER_GITHUB_ID $CHECKER_GITHUB_PASSWORD | tr '\"' '@')
 
   local COLLABORATORS=$(echo $GITHUB_RESP | tr '/"' '@' | tr ',' '\n' | grep "@login@:" | cut -d '@' -f4)
   echo $COLLABORATORS
@@ -255,6 +286,16 @@ function addCollaboratorToRepoOnGitHub {
   else
     echo false
   fi
+}
+
+function getCollaborationInvitationsOnGitHub {
+  local GITHUB_ID=$1
+  local GITHUB_PASSWORD=$2
+
+  local GITHUB_URL="https://api.github.com/user/repository_invitations"
+  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $GITHUB_ID $GITHUB_PASSWORD)
+
+  echo $GITHUB_RESP
 }
 
 function acceptCollborationInviteOnGitHub {

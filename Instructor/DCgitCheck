@@ -68,8 +68,7 @@ INSTRUCTOR_GITHUB_PASSWORD=$(getGitHubPassword $INSTRUCTOR_GITHUB_ID)
 echo "Checking on "$ASSIGNMENT_ID"..."
 
 echo "  Accepting pending invitations to "$ASSIGNMENT_ID"..."
-GITHUB_URL="https://api.github.com/user/repository_invitations"
-GITHUB_RESP=$(curl -s -S $GITHUB_URL -u "$INSTRUCTOR_GITHUB_ID:$INSTRUCTOR_GITHUB_PASSWORD" 2>&1)
+GITHUB_RESP=$(getCollaborationInvitationsOnGitHub $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD)
 COUNT=0
 for STU in $STUDENT_LIST
 do
@@ -95,27 +94,27 @@ STU_SEEN=""
 STU_SEEN_AGAIN=""
 
 # Cache the list of repositories on which the instructor is a collaborator.
-# Probably going to need to deal with pages here because it will get long!!!!!
 GITHUB_URL="https://api.github.com/user/repos"
-INST_COLLAB_REPOS=$(curl -s -S -X GET $GITHUB_URL -u $INSTRUCTOR_GITHUB_ID:$INSTRUCTOR_GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+INST_COLLAB_REPOS=$(readGitHubAPIPagedResult $GITHUB_URL $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD | tr '\"' '@')
+INST_COLLAB_REPO_NAMES=$(echo $INST_COLLAB_REPOS | tr ',' '\n' | grep "@full_name@:")
 
-for STU in $STUDENT_LIST
+for STUDENT in $STUDENT_LIST
 do
   # does the student own the repo?
-  MATCH="@full_name@: @"$STU"/"$ASSIGNMENT_ID"@"
-  if [[ $INST_COLLAB_REPOS == *"$MATCH"* ]] ; then
-    LINE=$STU
+  MATCH="@full_name@: @"$STUDENT"/"$ASSIGNMENT_ID"@"
+  if [[ $INST_COLLAB_REPO_NAMES == *"$MATCH"* ]] ; then
+    LINE=$STUDENT
 
-    if [[ ! $STU_SEEN == *" $STU "* ]] ; then
-      STU_SEEN=" "$STU" "$STU_SEEN
-    elif [[ ! $STU_SEEN_AGAIN == *" $STU "* ]] ; then
-      STU_SEEN_AGAIN=" "$STU" "$STU_SEEN_AGAIN
+    if [[ ! $STU_SEEN == *" $STUDENT "* ]] ; then
+      STU_SEEN=" "$STUDENT" "$STU_SEEN
+    elif [[ ! $STU_SEEN_AGAIN == *" $STUDENT "* ]] ; then
+      STU_SEEN_AGAIN=" "$STUDENT" "$STU_SEEN_AGAIN
     fi
 
-    COLLABORATORS=$(getCollaboratorsOnGitHub $ASSIGNMENT_ID $STU $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD)
+    COLLABORATORS=$(getCollaboratorsOnGitHub $ASSIGNMENT_ID $STUDENT $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD)
     for COLLAB in $COLLABORATORS
     do
-      if [[ "$COLLAB" != "$STU" && "$COLLAB" != "$INSTRUCTOR_GITHUB_ID" ]] ; then
+      if [[ "$COLLAB" != "$STUDENT" && "$COLLAB" != "$INSTRUCTOR_GITHUB_ID" ]] ; then
         LINE=$LINE" : "$COLLAB
 
         if [[ ! $STU_SEEN == *" $COLLAB "* ]] ; then
@@ -131,17 +130,17 @@ do
 done
 
 echo "  Students not seen were:"
-for STU in $STUDENT_LIST
+for STUDENT in $STUDENT_LIST
 do
-  if [[ ! $STU_SEEN == *" $STU "* ]] ; then
-    echo "    "$STU
+  if [[ ! $STU_SEEN == *" $STUDENT "* ]] ; then
+    echo "    "$STUDENT
   fi
 done
 
 echo "  Students seen twice were:"
-for STU in $STU_SEEN_AGAIN
+for STUDENT in $STU_SEEN_AGAIN
 do
-  echo "    "$STU
+  echo "    "$STUDENT
 done
 
 echo "Done."
