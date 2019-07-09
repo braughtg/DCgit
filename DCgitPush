@@ -47,7 +47,9 @@ if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
 fi
 
 # Is the assignment repository writeable on GitHub by the student?
-if ! $(repoWritableOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+cd $ASSIGNMENT_ID
+READ_ACCESS=$(git push --dry-run)
+if [[ $READ_ACCESS == *"denied"* || $READ_ACCESS == *"fatal"* ]] ; then
   echo "You do not have write access to "$ASSIGNMENT_ID" on GitHub."
   echo "  Make sure you or your partner has used DCgitBegin to start the assignment"
   echo "  If your partner used DCgitBegin:"
@@ -55,6 +57,7 @@ if ! $(repoWritableOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PA
   echo "    Make sure your partner added you as a collaborator on "$ASSIGNMENT_ID"."
   exit -1
 fi
+cd ..
 
 #
 # All of the preconditions are satisfied...
