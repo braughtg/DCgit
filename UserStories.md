@@ -192,8 +192,10 @@ Each work session should begin by pulling the work from GitHub and end by pushin
          - creates a directory for the student and collaborators in the _AssignmentID_.submissions directory.
             - the directory is named using a period delimited concatenation of the student collaborators' GitHub IDs.
          - clone's the repository into the directory
-1. Mark and comment on the files in the cloned repositories.
-1. Use the DCgitReturn script to push marked assignments back to the students.
+1. Makes a "Graded" branch
+1. Checks out the "Graded" branch
+1. Mark and comment on the files in "Graded" branch of the cloned repositories.
+1. Use the DCgitReturn script to push the "Graded" branch back to the students.
 1. The script terminates if:
    - not run from the _CourseID_/Instructor directory.
    - the _StudentList_ file is not readable.
@@ -213,7 +215,9 @@ Each work session should begin by pulling the work from GitHub and end by pushin
    - there is no _AssignmentID_.submissions directory.
 
 #### Closing a Course
-NEED TO DROP SELF AS A COLLABORATOR FROM ALL REPOS IN THE COURSE
+DROP SELF AS A COLLABORATOR FROM ALL REPOS IN THE COURSE
+DELETE ALL COLLECTED REPOS
+
 
 
   ___
