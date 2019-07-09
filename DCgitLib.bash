@@ -140,14 +140,14 @@ function getAccessibleRepoFullName {
 }
 
 function repoOwnedOnGitHub {
-  # Includes all repos public and private that are owned by GITHUB_ID.
   local REPO_ID=$1
   local GITHUB_ID=$2
   local GITHUB_PASSWORD=$3
 
-  local GITHUB_URL="https://api.github.com/user/repos"
-  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $GITHUB_ID $GITHUB_PASSWORD "-G -d affiliation=owner" | tr '\"' '@')
-  if [[ $GITHUB_RESP == *"@name@: @$REPO_ID@"* ]] ; then
+  local GITHUB_URL="https://api.github.com/repos/"$GITHUB_ID"/"$REPO_ID
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $GITHUB_ID:$GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+
+  if [[ $GITHUB_RESP == *"@full_name@: @$GITHUB_ID/$REPO_ID@"* ]] ; then
     echo true
   else
     echo false
@@ -155,17 +155,14 @@ function repoOwnedOnGitHub {
 }
 
 function isRepoOwnerOnGitHub {
-  # Includes all repos public and private that are accessible by CHECKER_GITHUB_ID.
-  # This can be slow because instructor will be collaborator on lots of repos.
   local REPO_ID=$1
   local OWNER_GITHUB_ID=$2
   local CHECKER_GITHUB_ID=$3
   local CHECKER_GITHUB_PASSWORD=$4
 
-  local GITHUB_URL="https://api.github.com/user/repos"
-  local GITHUB_RESP=$(readGitHubAPIPagedResult $GITHUB_URL $CHECKER_GITHUB_ID $CHECKER_GITHUB_PASSWORD | tr '\"' '@')
-  MATCH="@full_name@: @"$OWNER_GITHUB_ID"/"$REPO_ID"@"
-  if [[ $GITHUB_RESP == *"$MATCH"* ]] ; then
+  local GITHUB_URL="https://api.github.com/repos/"$OWNER_GITHUB_ID"/"$REPO_ID
+  local GITHUB_RESP=$(curl -s -S -X GET $GITHUB_URL -u $CHECKER_GITHUB_ID:$CHECKER_GITHUB_PASSWORD | tr '\"' "@" 2>&1)
+  if [[ $GITHUB_RESP == *"@full_name@: @$OWNER_GITHUB_ID/$REPO_ID@"* ]] ; then
     echo true
   else
     echo false

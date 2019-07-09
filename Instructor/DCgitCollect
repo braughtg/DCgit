@@ -83,11 +83,6 @@ if [[ ! -d $ASSIGNMENT_ID".submissions" ]] ; then
   mkdir $ASSIGNMENT_ID".submissions"
 fi
 
-# Cache the list of repositories on which the instructor is a collaborator.
-GITHUB_URL="https://api.github.com/user/repos"
-INST_COLLAB_REPOS=$(readGitHubAPIPagedResult $GITHUB_URL $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD | tr '\"' '@')
-INST_COLLAB_REPO_NAMES=$(echo $INST_COLLAB_REPOS | tr ',' '\n' | grep "@full_name@:")
-
 # Process each of the students cloning the owned repositories...
 echo "  Processing students..."
 for STUDENT in $STUDENT_LIST
@@ -102,8 +97,7 @@ do
 
   # Only clone from the owner... use collaborators in directory names...
   # does the student own the repo?
-  MATCH="@full_name@: @"$STUDENT"/"$ASSIGNMENT_ID"@"
-  if [[ $INST_COLLAB_REPO_NAMES == *"$MATCH"* ]] ; then
+  if $(isRepoOwnerOnGitHub $ASSIGNMENT_ID $STUDENT $INSTRUCTOR_GITHUB_ID $INSTRUCTOR_GITHUB_PASSWORD) ; then
     echo "      "$STUDENT" owns "$ASSIGNMENT_ID"."
     echo "      Getting collaborators..."
 
