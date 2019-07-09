@@ -189,7 +189,6 @@ else
   echo "Cloning the assignment "$ASSIGNMENT_ID" from GitHub to the local machine..."
 
   FULL_REPO_NAME=$(getAccessibleRepoFullName $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
-
   # Give a choice if there is more than one repo accessible...
   if [[ $(echo $FULL_REPO_NAME | wc -w) -gt 1 ]] ; then
     echo "  More than one repository avaialble.  Please choose one."
