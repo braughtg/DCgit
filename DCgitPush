@@ -68,7 +68,7 @@ cd $ASSIGNMENT_ID
 
 # Are there changes to be pushed?
 GIT_OUT=$(git status 2>&1)
-if [[ $GIT_OUT == *"Your branch is up to date"* && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
+if [[ $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
   echo "  There have been no changes to the local assignment. Nothing to push."
   echo "Done."
   exit 1
@@ -124,7 +124,7 @@ if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
 fi
 
 GIT_OUT=$(git status 2>&1)
-if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
+if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT != *"nothing to commit, working tree clean"* ]] ; then
   echo "    There was a problem pushing the changed assignment to GitHub."
   echo "    See your instructor for assistance."
   exit -1
