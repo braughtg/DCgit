@@ -18,7 +18,7 @@
 if [ "$#" -eq 1 ] ; then
   ASSIGNMENT_ID=$1
   REPLACE=false
-elif [ "$#" -eq 2 && "$2" == "Replace" ] ; then
+elif [[ "$#" -eq 2 && "$2" == "Replace" ]] ; then
   ASSIGNMENT_ID=$1
   REPLACE=true
 else
@@ -53,7 +53,7 @@ if [[ ! -d $ASSIGNMENT_ID ]] ; then
 fi
 
 # Does the student already have the assignment on GitHub?
-if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) && ! $REPLACE ; then
   echo "It appears that you already have "$ASSIGNMENT_ID" in your GitHub."
   echo "Things to check:"
   echo "  Did you mean to use DCgitPush?"
@@ -76,6 +76,17 @@ fi
 #
 
 echo "Copying "$ASSIGNMENT_ID" to your GitHub..."
+
+if $REPLACE ; then
+  echo "  Replace was specified..."
+  echo "    Deleting existing repository from GitHub..."
+  if $(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+    echo "    Deleted."
+  else
+    echo "    Unable to delete "$ASSIGNMENT_ID" from GitHub. Try removing it manually."
+    exit -1
+  fi
+fi
 
 echo "  Creating new repository on GitHub..."
 GITHUB_OUT=$(createNewRepoOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD true)
