@@ -1,0 +1,115 @@
+#!/bin/bash
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright 2019 Grant Braught
+
+if [ "$#" -eq 1 ] ; then
+  ASSIGNMENT_ID=$1
+  REPLACE=false
+elif [ "$#" -eq 2 && "$2" == "Replace" ] ; then
+  ASSIGNMENT_ID=$1
+  REPLACE=true
+else
+  echo "Usage: DCgitCopy AssignmentID [ Replace ]"
+  echo "  AssignmentID : The name of the assignment to be copied from your partner."
+  echo "       Replace : [Optional] Include to replace your repository on GitHub if it exists."
+  exit -1
+fi
+
+# Source the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/.DCgitConfig.bash
+. $SCRIPT_DIR/DCgitLib.bash
+
+# Obtain and validate the student's GitHub password
+STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID)
+
+# Are we running inside of the course directory?
+if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+  echo "DCgitCopy must be run from within the "$COURSE_ID" directory."
+  echo "Things to check:"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitCopy?"
+  exit -1
+fi
+
+# Does the assignment repository already exist locally?
+if [[ ! -d $ASSIGNMENT_ID ]] ; then
+  echo "You do not have "$ASSIGNMENT_ID"."
+  echo "Things to check:"
+  echo "  Try using DCgitPull to get the assignment first."
+  exit -1
+fi
+
+# Does the student already have the assignment on GitHub?
+if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
+  echo "It appears that you already have "$ASSIGNMENT_ID" in your GitHub."
+  echo "Things to check:"
+  echo "  Did you mean to use DCgitPush?"
+  echo "  Use DCgitCopy Assignment Replace to replace your GitHub copy."
+  exit -1
+fi
+
+# Does the local assignment already point to the student's own GitHub?
+GIT_OUT=$(git -C $ASSIGNMENT_ID remote get-url origin 2>&1)
+NEW_ORIGIN="https://"$STUDENT_GITHUB_ID"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
+if [[ $GIT_OUT == "$NEW_ORIGIN" ]] ; then
+  echo "It appears that you already have your own copy of "$ASSIGNMENT_ID"."
+  echo "Things to check:"
+  echo "  Did you mean to use DCgitPush?"
+  exit -1
+fi
+
+#
+# All of the preconditions are satisfied...
+#
+
+echo "Copying "$ASSIGNMENT_ID" to your GitHub..."
+
+echo "  Creating new repository on GitHub..."
+GITHUB_OUT=$(createNewRepoOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD true)
+if ! $GITHUB_OUT ; then
+  echo "   Unable to create new repository."
+  echo "   See your instructor for assistance."
+  exit -1
+fi
+
+echo "  Changing local repository origin to point to your GitHub..."
+echo "    New Origin: "$NEW_ORIGIN
+GIT_OUT=$(git -C $ASSIGNMENT_ID remote set-url origin $NEW_ORIGIN)
+GIT_OUT=$(git -C $ASSIGNMENT_ID remote get-url origin 2>&1)
+if [[ $GIT_OUT != "$NEW_ORIGIN" ]] ; then
+  echo "    Unable to change local repository origin."
+  echo "    See your instructor for assistance."
+  exit -1
+fi
+
+echo "  Setting up tracking for remote branches..."
+BRANCHES=$(git -C $ASSIGNMENT_ID branch -r | grep -v "master" | cut -d'/' -f 2)
+for BRANCH in $BRANCHES
+do
+  echo "    Tracking "$BRANCH
+  GIT_OUT=$(git -C $ASSIGNMENT_ID branch --track $BRANCH)
+done
+
+echo "  Pushing local repository to your GitHub..."
+GIT_OUT=$(git -C $ASSIGNMENT_ID push --all 2>&1)
+GIT_OUT=$(git -C $ASSIGNMENT_ID status 2>&1)
+if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT != *"nothing to commit, working tree clean"* ]] ; then
+  echo "    There was a problem pushing to GitHub."
+  echo "    See your instructor for assistance."
+  exit -1
+fi
+
+echo "Done."

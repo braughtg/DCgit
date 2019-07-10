@@ -53,13 +53,13 @@ This is only done once per assignment, and only by one partner if the work is pa
 A partner and the instructor are automatically added as collaborators when the DCgitBegin script is used.  So using it is the easiest way to have them setup.
 
 #### Adding Instructor or Partner after Starting an Assignment:
-1. Maually add the instructor or partner as collaborators on the assignment repository in GitHub.
+1. Manually add the instructor or partner as collaborators on the assignment repository in GitHub.
    1. Open the "Settings" tab (_gear icon_) for the repository
    1. Choose "Collaborators"
    1. Add the instructor and/or partner
 
 #### Removing a Partner from an Assignment:
-1. Manualy remove the partner as a collaborator on the assignment repository in GitHub.
+1. Manually remove the partner as a collaborator on the assignment repository in GitHub.
    1. Open the "Settings" tab (_gear icon_) for the repository
    1. Choose "Collaborators"
    1. Click the "X" next to partner's ID
@@ -71,7 +71,7 @@ A partner and the instructor are automatically added as collaborators when the D
 
 #### Pulling an Assignment from GitHub to Local Machine:
 1. Open terminal (if not already open)
-1. Change to assignment directory.
+1. Change to the course directory.
 1. ./DCgitPull _AssignmentID_ [ _ForceRemote_ | _ManualMerge_ ]
    - _AssignmentID_ indicates the assignment to be pulled from GitHub.
    - Specify _ForceRemote_ to overwrite local repository with the GitHub version.
@@ -89,7 +89,7 @@ A partner and the instructor are automatically added as collaborators when the D
 
 #### Pushing an Assignment from Local Machine to GitHub:
 1. Open terminal
-1. Change to assignment directory.
+1. Change to course directory.
 1. ./DCgitPush _AssignmentID_ [ _ForceLocal_ ]
    - _AssignmentID_ indicates the assignment to be pushed to GitHub.
    - Specify _ForceLocal_ to overwrite GitHub repository with the version from the local machine.
@@ -118,17 +118,28 @@ A partner and the instructor are automatically added as collaborators when the D
 #### Getting your Graded and Marked Work locally
 1. Open terminal
 1. Change to the assignment directory
-1. git fecth
+1. git fetch
 1. git checkout Graded
    - All files will now be those returned by the instructor.
 1. git checkout master
    - Returns you to your version of the files.
 
 #### Getting a Copy of Completed Partnered Work in Your Own GitHub
-1. Import repository from your partner's GitHub into your GitHub as a __private__ repository.
-   1. Copy the URL of your partner's repository.
-   1. Choose "Import repository" under the + icon in the upper right.
-   1. Provide the URL and indicate that imported repository should be private.
+1. Ensure that you have used DCgitPull to get a copy of the assignment from your partner.
+1. Open terminal
+1. Change to the course directory
+1. ./DCGitCopy _AssignmentID_ [ Replace ]
+1. Enter _GitHubUserName_ and _GitHubPassword_ (if not saved during configuration)
+   - Ask again if failure to authenticate with GitHub
+1. The script then:
+  - Creates a new bare repo on GitHub.
+  - Changes the origin remote in the local repo to point at the GitHub repo.
+  - Pushes all branches of the local repo to GitHub.
+1. The script terminates if:
+  - not run from within the course directory.
+  - the assignment doesn't exist locally.
+  - the assignment remotes already point to the student's GitHub
+  - the assignment exists in the student's GitHub but "Replace" is not indicated.
 
 #### Starting an Assignment Over Again
 1. Open terminal
