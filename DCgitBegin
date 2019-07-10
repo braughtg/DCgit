@@ -47,7 +47,7 @@ fi
 if [[ -d $ASSIGNMENT_ID ]] ; then
   echo "You already have a directory for "$ASSIGNMENT_ID"."
   echo "Things to check:"
-  echo "  Did you mean to cd "$ASSIGNMENT_ID" and then use DCgitPull?"
+  echo "  Did you mean to use DCgitPull?"
   exit -1
 fi
 
