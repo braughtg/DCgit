@@ -4,7 +4,7 @@
 
 ### Beginning a new Course
 
-The course must be begun on each machine so that the necessary scripts are present in the student account on the machine.
+This must be done once on each machine that you use.
 
 1. Open terminal
 1. git clone _CourseGitHubURL_
@@ -14,7 +14,7 @@ The course must be begun on each machine so that the necessary scripts are prese
 
 ### Starting an Assignment
 
-An assignment needs to be started only once, and only by one partner if the work is paired.
+This is only done once per assignment, and only by one partner if the work is paired.
 
 #### Using the Scripts:
 1. Open terminal
@@ -50,7 +50,7 @@ An assignment needs to be started only once, and only by one partner if the work
 
 ### Adding and Removing Partners
 
-A partner and the instructor are automatically added as collaboratoprs when the DCgitBegin script is used.  So using it is the easiest way to have them setup.
+A partner and the instructor are automatically added as collaborators when the DCgitBegin script is used.  So using it is the easiest way to have them setup.
 
 #### Adding Instructor or Partner after Starting an Assignment:
 1. Maually add the instructor or partner as collaborators on the assignment repository in GitHub.
@@ -65,8 +65,9 @@ A partner and the instructor are automatically added as collaboratoprs when the 
    1. Click the "X" next to partner's ID
 
 ### Working on an Assignment
-
-Each work session should begin by pulling the work from GitHub and end by pushing the work to GitHub.
+1. Pull work from GitHub using DCgitPull (see below).
+1. Work on the files on the local machine.
+1. Push the work to GitHub using DCgitPush (see below).
 
 #### Pulling an Assignment from GitHub to Local Machine:
 1. Open terminal (if not already open)
@@ -103,6 +104,25 @@ Each work session should begin by pulling the work from GitHub and end by pushin
    - the _GitHubUserName_ does not have write permission for the remote assignment repository.
    - there are no local changes to commit.
    - there is a problem committing changed files and _ForceLocal_ is not specified.
+
+#### Seeing your Graded and Marked Work on GitHub
+1. Graded work returned by the instructor can easily be viewed on GitHub.
+1. Go to the assignment repository on GitHub.
+1. Click the box labeled "Branch: master"
+1. Choose "Graded"
+   - This will switch you to the version of your files returned by the instructor.
+   - They will have the instructor's comments and grades in them when you view them.
+1. Clicking the word "Compare" will highlight the additions/changes made by the instructor.
+1. Click the box labeled "Branch: Graded" and choose "master" to return to your version of the files.
+
+#### Getting your Graded and Marked Work locally
+1. Open terminal
+1. Change to the assignment directory
+1. git fecth
+1. git checkout Graded
+   - All files will now be those returned by the instructor.
+1. git checkout master
+   - Returns you to your version of the files.
 
 #### Getting a Copy of Completed Partnered Work in Your Own GitHub
 1. Import repository from your partner's GitHub into your GitHub as a __private__ repository.
@@ -152,6 +172,14 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 1. Add instructions, files and resources as necessary.
 1. Commit and push the changes.
 
+#### Grading or Marking an Assignment
+1. Check the assignments using DCgitCheck (see below)
+   - This accepts collaboration invitations and reports on student collaborators.
+1. Collect the assignments using DCgitCollect (see below)
+1. Make changes to files in the "Graded" branch of each repository.
+   - Changes can be committed manually or the DCgitReturn script will commit them all at once.
+2. Return the graded assignments using DCgitReturn (see below)
+
 #### Checking/Accepting Collaboration Invitations
 1. Open terminal
 1. Change to Instructor directory for the course.
@@ -194,8 +222,6 @@ Each work session should begin by pulling the work from GitHub and end by pushin
          - clone's the repository into the directory
 1. Makes a "Graded" branch
 1. Checks out the "Graded" branch
-1. Mark and comment on the files in "Graded" branch of the cloned repositories.
-1. Use the DCgitReturn script to push the "Graded" branch back to the students.
 1. The script terminates if:
    - not run from the _CourseID_/Instructor directory.
    - the _StudentList_ file is not readable.
@@ -203,22 +229,16 @@ Each work session should begin by pulling the work from GitHub and end by pushin
 #### Returning an Assignment
 1. Open terminal
 1. Change to the Instructor directory for the course.
-1. ./DCgitReturn _AssignmentID_ -L _StudentList_ | -S _StudentID_
-   - -L _StudentList_ | -S _StudentID_
-      - -L StudentList - provide a list of students. See the _StudentList.sample_ file in the Instructor directory.
-      - -S StudentID - provide the GitHub ID of a single student.
+1. ./DCgitReturn _AssignmentID_ [ _StudentID_ ]
+      -S StudentID - [optional] provide the GitHub ID of a single student to return any repo on which that student is a collaborator.
 1. The script then:
-   - Commits and pushes all changes to all indicated repositories.
+   - For each repository (or for those involving the specified student):
+      - Commits changes to the "Graded" branch.
+      - Pushes the "Graded" branch to GitHub.
 1. The script terminates if:
    - not run from the _CourseID_/Instructor directory.
    - the _StudentList_ file is not readable.
    - there is no _AssignmentID_.submissions directory.
-
-#### Closing a Course
-DROP SELF AS A COLLABORATOR FROM ALL REPOS IN THE COURSE
-DELETE ALL COLLECTED REPOS
-
-
 
   ___
   ![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")

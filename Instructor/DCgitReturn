@@ -1,0 +1,132 @@
+#!/bin/bash
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright 2019 Grant Braught
+
+function printUsage {
+  echo "Usage: DCgitReturn AssignmentID [ StudentID ]"
+  echo "  AssignmentID : The name of the assignment to collect."
+  echo "     StudentID : [Optional] include to push for only one student (and any partners)."
+}
+
+if [[ "$#" -lt 1 || "$#" -gt 2 ]] ; then
+  printUsage
+  exit -1
+fi
+
+ASSIGNMENT_ID=$1
+STUDENT_ID=""
+if [[ "$#" -eq 2 ]] ; then
+  STUDENT_ID=$2
+fi
+
+# Are we running inside of the course and instructor directory?
+if [[ "${PWD##*/}" != "Instructor" ]] ; then
+  cd ..
+  if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+    echo "DCgitCollect must be run from within the "$COURSE_ID"/Instructor directory."
+    exit -1
+  fi
+fi
+
+# Does the ASSIGNMENT_ID.submissions directory exist?
+if [[ ! -d $ASSIGNMENT_ID".submissions" ]] ; then
+  echo "No submissions for "$ASSIGNMENT_ID"."
+  echo "Have you used DCgitCheck and DCgitCollect?"
+  exit -1
+fi
+
+# Source the configuration file and the library functions...
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/../.DCgitConfig.bash
+. $SCRIPT_DIR/../DCgitLib.bash
+
+# Obtain and validate the instructor's GitHub password
+INSTRUCTOR_GITHUB_PASSWORD=$(getGitHubPassword $INSTRUCTOR_GITHUB_ID)
+
+echo "Returning "$ASSIGNMENT_ID"..."
+cd $ASSIGNMENT_ID".submissions"
+
+if [[ $STUDENT_ID != "" ]] ; then
+  ASSIGNMENT_DIRS=$(ls | grep "$STUDENT_ID")
+else
+  ASSIGNMENT_DIRS=$(ls)
+fi
+
+for DIR in $ASSIGNMENT_DIRS
+do
+  echo "  Returning "$DIR"..."
+
+  GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID checkout Graded 2>&1)  # just to be sure.
+  GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID status 2>&1)
+  if [[ $GIT_OUT == *"On branch Graded"* ]] ; then
+
+    # Are there changes to be pushed?
+    GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID status 2>&1)
+    if [[ $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
+      echo "    There have been no changes to the Graded branch. Nothing to push."
+      echo "    Skipping."
+      continue
+    fi
+
+    echo "    Staging the grading comments..."
+    GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID add --all 2>&1)
+    if [[ $GIT_OUT != "" ]] ; then
+      # unstage everything to put it back the way we found it...
+      git reset 2>&1 > /dev/null
+      echo "      Problem staging the grading comments."
+      echo "      Were there conflicts? Try checking manually for more information."
+      echo "      Skipping."
+      continue
+    fi
+
+    # Commit the grading comments...
+    echo "    Committing the grading comments..."
+    COMMIT_MESSAGE=$INSTRUCTOR_GITHUB_ID" committed grading comments - "$(date)"."
+    GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID commit -m "$COMMIT_MESSAGE" 2>&1)
+
+    # Push the the Graded branch to the origin...
+    echo "    Pushing the Graded branch to GitHub..."
+    GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID push origin Graded 2>&1)
+    if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
+      # Undo the last commit to put things back the way we found them...
+      git -C $DIR"/"$ASSIGNMENT_ID reset --soft HEAD~1 2>&1 > /dev/null
+      # Unstage everything that was staged...
+      git -C $DIR"/"$ASSIGNMENT_ID reset 2>&1 > /dev/null
+
+      echo "      Unable to push Graded branch got GitHub."
+      echo "      Were there conflicts? Try checking manually for more information."
+      echo "      Skipping."
+      continue
+    fi
+
+    GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID status 2>&1)
+    if [[ $GIT_OUT != *"nothing to commit, working tree clean"* ]] ; then
+      echo "    There was a problem pushing the Graded branch to GitHub."
+      echo "    Try checking manually for more information."
+      echo "    Skipping."
+      continue
+    fi
+
+  else
+    echo "    No \"Graded\" branch found."
+    echo "    Skipping."
+  fi
+
+  echo "    Returned."
+done
+
+
+echo "Done."
