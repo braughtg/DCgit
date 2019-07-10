@@ -21,8 +21,8 @@ if ! $CONFIGURED ; then
 fi
 
 # These are set by the instructor after the repo is forked.
-COURSE_ID="DCgit"  # Must match the course repo name.
-GITHUB_COURSE_ORG="CourseName"
+COURSE_ID="CourseRepo"  # Must match the course repo name.
+GITHUB_COURSE_ORG="CourseOrg"  # Must match the course org name.
 INSTRUCTOR_GITHUB_ID="InstructorGitHubID"
 
 # These will be rewritten by the DCgitConfig script when run by the student.
