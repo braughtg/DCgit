@@ -117,7 +117,7 @@ done
 echo "  Pushing local repository to your GitHub..."
 GIT_OUT=$(git -C $ASSIGNMENT_ID push --all 2>&1)
 GIT_OUT=$(git -C $ASSIGNMENT_ID status 2>&1)
-if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT != *"nothing to commit, working tree clean"* ]] ; then
+if [[ $GIT_OUT != *"Your branch is up"*  && $GIT_OUT != *"nothing to commit"* ]] ; then
   echo "    There was a problem pushing to GitHub."
   echo "    See your instructor for assistance."
   exit -1
