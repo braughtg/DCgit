@@ -2,6 +2,11 @@
 
 DCgit is a set of scripts for managing assignments as GitHub repositories in an introductory programming course.
 
+## Technical Dependencies
+- basic Unix tools: grep, sed, awk, tr, cut, head, wc, etc..
+- curl
+- python3
+
 ## Basic Student Use:
 1. Create a GitHub account
 1. __Once on each machine__ you use:
