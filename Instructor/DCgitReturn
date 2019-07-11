@@ -99,7 +99,7 @@ do
 
     # Push the the Graded branch to the origin...
     echo "    Pushing the Graded branch to GitHub..."
-    GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID push origin Graded 2>&1)
+    GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID push origin Graded --force 2>&1)
     if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
       # Undo the last commit to put things back the way we found them...
       git -C $DIR"/"$ASSIGNMENT_ID reset --soft HEAD~1 2>&1 > /dev/null
