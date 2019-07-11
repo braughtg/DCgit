@@ -28,6 +28,13 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
    1. `./DCgitPull AssignmentID`
    1. Work on the assignment.
    1. `./DCgitPush AssignmentID`
+1. To see instructor comments and graded work:
+   1. Open a terminal
+   1. `cd CourseName`
+   1. `./DCgitPull AssignmentID`
+   1. `git checkout Graded`
+   1. The files will contain the instructor comments and grades.
+   1. `git checkout master` (to return to ungraded version).
 1. To copy from partner when assignment is complete:
    1. Open a terminal
    1. `cd CourseName`
@@ -66,8 +73,6 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
    1. Use DCgitReturn to push the "Graded" branch to the students.
 
 ___
-![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License")
-###### All textual materials used in this course are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+![Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License") All textual materials used in this course are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-![GPL V3 or Later](https://www.gnu.org/graphics/gplv3-or-later-sm.png "GPL V3 or later")
-###### All executable code used in this course is licensed under the [GNU General Public License Version 3 or later](https://www.gnu.org/licenses/gpl.txt)
+![GPL V3 or Later](https://www.gnu.org/graphics/gplv3-or-later-sm.png "GPL V3 or later") All executable code used in this course is licensed under the [GNU General Public License Version 3 or later](https://www.gnu.org/licenses/gpl.txt)
