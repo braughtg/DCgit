@@ -34,7 +34,7 @@ sed -i.bak $SED_CMD .DCgitConfig.bash
 
 # If there is no credential helper configured use the cache
 GIT_CREDENTIAL_HELPER=$(git config --global credential.helper)
-if [ -n "$(echo -n $GIT_CREDENTIAL_HELPER)" ] ; then
+if [[ $GIT_CREDENTIAL_HELPER == "" ]] ; then
   git config --global credential.helper 'cache --timeout=43200' # 12 hours
 fi
 
@@ -45,7 +45,7 @@ git config --global push.default simple
 echo ""
 echo -n "Configure a merge tool for git [y/n]: "
 read CONFIG_MERGE
-if $CONFGIG_MERGE ; then
+if [[ $CONFGIG_MERGE == "y" ]] ; then
   echo ""
   echo -n "Name of the merge tool (use git mergetool --tool-help to see supported tools): "
   read MERGE_TOOL_NAME
