@@ -48,7 +48,7 @@ fi
 
 # Is the assignment repository writeable on GitHub by the student?
 cd $ASSIGNMENT_ID
-READ_ACCESS=$(git push --dry-run)
+READ_ACCESS=$(git push --dry-run 2>&1)
 if [[ $READ_ACCESS == *"denied"* || $READ_ACCESS == *"fatal"* ]] ; then
   echo "You do not have write access to "$ASSIGNMENT_ID" on GitHub."
   echo "  Make sure you or your partner has used DCgitBegin to start the assignment"
@@ -68,7 +68,8 @@ cd $ASSIGNMENT_ID
 
 # Are there changes to be pushed?
 GIT_OUT=$(git status 2>&1)
-if [[ $GIT_OUT == *"nothing to commit, working tree clean"* ]] ; then
+# Note: Mac "working tree clean", Linux "working directory clean"
+if [[ $GIT_OUT == *"nothing to commit"* ]] ; then
   echo "  There have been no changes to the local assignment. Nothing to push."
   echo "Done."
   exit 1
@@ -124,7 +125,8 @@ if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
 fi
 
 GIT_OUT=$(git status 2>&1)
-if [[ $GIT_OUT != *"Your branch is up to date"*  && $GIT_OUT != *"nothing to commit, working tree clean"* ]] ; then
+# NOTE: Mac its "up to date" Linux its "up-to-date"
+if [[ $GIT_OUT != *"Your branch is up"*  && $GIT_OUT != *"nothing to commit, working tree clean"* ]] ; then
   echo "    There was a problem pushing the changed assignment to GitHub."
   echo "    See your instructor for assistance."
   exit -1
