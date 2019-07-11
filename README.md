@@ -8,6 +8,7 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
    1. Open a terminal
    1. `git clone CourseURL`
    1. `cd CourseName`
+   1. `chmod 755 DCgit*`
    1. `./DCgitConfigure`
 1. __Once by one partner__ for each assignment:
    1. Open a terminal
@@ -28,6 +29,8 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
 1. Create an organization for your course.
 1. Use the "Use this template" button in the DCgit repository on GitHub to create a repository for your course in your organization.
 1. Clone the repository to your machine.
+1. `cd CourseName/Instructor`
+1. `chmod 755 DCgit*`
 1. Edit the .DCGitConfig.bash file and update:
    - `COURSE_ID`
    - `GITHUB_COURSE_ORG`
