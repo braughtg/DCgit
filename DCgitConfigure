@@ -45,7 +45,7 @@ git config --global push.default simple
 echo ""
 echo -n "Configure a merge tool for git [y/n]: "
 read CONFIG_MERGE
-if [[ $CONFGIG_MERGE == "y" ]] ; then
+if [[ $CONFIG_MERGE == "y" ]] ; then
   echo ""
   echo -n "Name of the merge tool (use git mergetool --tool-help to see supported tools): "
   read MERGE_TOOL_NAME
