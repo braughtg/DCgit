@@ -57,18 +57,20 @@ if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWOR
   echo "It appears that you already have "$ASSIGNMENT_ID" in your GitHub."
   echo "Things to check:"
   echo "  Did you mean to use DCgitPush?"
-  echo "  Use DCgitCopy Assignment Replace to replace your GitHub copy."
+  echo "  Use DCgitCopy Replace to replace your GitHub copy."
   exit -1
 fi
 
 # Does the local assignment already point to the student's own GitHub?
-GIT_OUT=$(git -C $ASSIGNMENT_ID remote get-url origin 2>&1)
-NEW_ORIGIN="https://"$STUDENT_GITHUB_ID"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
-if [[ $GIT_OUT == "$NEW_ORIGIN" ]] ; then
-  echo "It appears that you already have your own copy of "$ASSIGNMENT_ID"."
-  echo "Things to check:"
-  echo "  Did you mean to use DCgitPush?"
-  exit -1
+if ! $REPLACE ; then
+  GIT_OUT=$(git -C $ASSIGNMENT_ID remote get-url origin 2>&1)
+  NEW_ORIGIN="https://"$STUDENT_GITHUB_ID"@github.com/"$STUDENT_GITHUB_ID"/"$ASSIGNMENT_ID".git"
+  if [[ $GIT_OUT == "$NEW_ORIGIN" ]] ; then
+    echo "It appears that you already have your own copy of "$ASSIGNMENT_ID"."
+    echo "Things to check:"
+    echo "  Did you mean to use DCgitPush?"
+    exit -1
+  fi
 fi
 
 #
@@ -98,7 +100,7 @@ fi
 
 echo "  Changing local repository origin to point to your GitHub..."
 echo "    New Origin: "$NEW_ORIGIN
-GIT_OUT=$(git -C $ASSIGNMENT_ID remote set-url origin $NEW_ORIGIN)
+GIT_OUT=$(git -C $ASSIGNMENT_ID remote set-url origin $NEW_ORIGIN 2>&1)
 GIT_OUT=$(git -C $ASSIGNMENT_ID remote get-url origin 2>&1)
 if [[ $GIT_OUT != "$NEW_ORIGIN" ]] ; then
   echo "    Unable to change local repository origin."
@@ -111,7 +113,7 @@ BRANCHES=$(git -C $ASSIGNMENT_ID branch -r | grep -v "master" | cut -d'/' -f 2)
 for BRANCH in $BRANCHES
 do
   echo "    Tracking "$BRANCH
-  GIT_OUT=$(git -C $ASSIGNMENT_ID branch --track $BRANCH)
+  GIT_OUT=$(git -C $ASSIGNMENT_ID branch --track $BRANCH 2>&1)
 done
 
 echo "  Pushing local repository to your GitHub..."
