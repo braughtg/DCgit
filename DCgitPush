@@ -69,7 +69,7 @@ cd $ASSIGNMENT_ID
 # Are there changes to be pushed?
 GIT_OUT=$(git status 2>&1)
 # Note: Mac "working tree clean", Linux "working directory clean"
-if [[ $GIT_OUT == *"nothing to commit"* ]] ; then
+if [[ $GIT_OUT == *"nothing to commit"* && $GIT_OUT != *"Your branch is ahead"* ]] ; then
   echo "  There have been no changes to the local assignment. Nothing to push."
   echo "Done."
   exit 1
