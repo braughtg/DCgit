@@ -37,13 +37,10 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
 1. Create an organization for your course.
 1. Use the "Use this template" button in the DCgit repository on GitHub to create a repository for your course in your organization.
 1. Through the GitHub interface, edit the .DCGitConfig.bash file and update:
-   - `COURSE_ID`
    - `GITHUB_COURSE_ORG`
-   - `INSTRUCTOR_GITHUB_ID`
+   - `COURSE_ID`
 1. Clone the repository to your machine.
 1. `cd CourseName/Instructor`
-1. Edit the .DCgitConfig.bash file and set:
-   - `CONFIGURED=true`
 1. `chmod 755 DCgit*`
 1. If you want to use GitHub Pages for the course website:
    1. Edit \_config.yml
@@ -55,6 +52,9 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
       1. Choose a theme for your site.
    1. Website URL will be: _CourseOrg_.github.io/_CourseRepoName_
 1. Commit and push changes
+1. Edit the .DCgitConfig.bash file and set:
+   - `CONFIGURED=true`
+   - `INSTRUCTOR_GITHUB_ID`
 1. Create a student list file in the Instructor directory (see StudentList.sample).
    - Best not to commit and push this file.
 1. Create a repository within the course organization for each assignment.
