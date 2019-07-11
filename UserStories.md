@@ -113,6 +113,7 @@ A partner and the instructor are automatically added as collaborators when the D
    - This will switch you to the version of your files returned by the instructor.
    - They will have the instructor's comments and grades in them when you view them.
 1. Clicking the word "Compare" will highlight the additions/changes made by the instructor.
+   - This doesn't work with Jupyter Notebooks, but fine with textual code files.
 1. Click the box labeled "Branch: Graded" and choose "master" to return to your version of the files.
 
 #### Getting your Graded and Marked Work locally
