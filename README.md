@@ -55,11 +55,11 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
 1. `cd CourseName/Instructor`
 1. `chmod 755 DCgit*`
 1. If you want to use GitHub Pages for the course website:
-   1. Edit \_config.yml
-   1. Edit index.md
+   1. Edit docs/\_config.yml
+   1. Edit docs/index.md
       - Be sure to adjust licensing on the web pages, if other than the CC-A-NC-SA 4.0 and GPL3.
    1. Add additional files as necessary
-   1. Open settings for the repository
+   1. Open settings for the repository on GitHub:
       1. Choose "master branch /docs folder" as the GitHub pages source.
       1. Choose a theme for your site.
    1. Website URL will be: _CourseOrg_.github.io/_CourseRepoName_
@@ -67,10 +67,11 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
 1. Edit the .DCgitConfig.bash file and set:
    - `CONFIGURED=true`
    - `INSTRUCTOR_GITHUB_ID`
+     - NOTE: These changes do not get pushed to GitHub.
 1. Create a student list file in the Instructor directory (see StudentList.sample).
-   - Best not to commit and push this file.
+   - NOTE: You should not commit and push this file (FERPA).
 1. Create a repository within the course organization for each assignment.
-1. Grading:
+1. Grading (See UserStories for more details on the following):
    1. Use DCgitCheck to accept invitations to student repositories.
    1. Use DCgitCollect to pull student repositories to your machine.
    1. Edit the files in the "Graded" branch of the student repositories.
