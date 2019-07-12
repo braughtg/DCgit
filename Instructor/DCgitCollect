@@ -129,8 +129,16 @@ do
       if [[ $GIT_OUT == *"Your branch is up to date"* ]] ; then
         echo "      Repository cloned."
 
-        echo "      Creating and checking out the \"Graded\" branch..."
-        GIT_OUT=$(git -C $REPO_PATH branch Graded 2>&1)
+        echo "      Creating the \"Graded\" branch..."
+        GIT_OUT=$(git -C $REPO_PATH branch -a 2>&1)
+        if [[ $GIT_OUT == *"remotes/origin/Graded"* ]] ; then
+          echo "        \"Graded\" branch already exists."
+        else
+          GIT_OUT=$(git -C $REPO_PATH branch Graded 2>&1)
+          echo "        \"Graded\" branch created."
+        fi
+
+        echo "      Checking out the \"Graded\" branch..."
         GIT_OUT=$(git -C $REPO_PATH checkout Graded 2>&1)
         GIT_OUT=$(git -C $REPO_PATH status 2>&1)
         if [[ $GIT_OUT == *"On branch Graded"* ]] ; then
