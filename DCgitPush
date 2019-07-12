@@ -121,6 +121,7 @@ if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
   echo "    Things to try:"
   echo "       Use DCgitPull "$ASSIGNMENT_ID" to update your local version with the changes on GitHub."
   echo "       Use DCgitPull "$ASSIGNMENT_ID" ForceRemote to replace your local version the GitHub version."
+  echo "       Use DCgitPull "$ASSIGNMENT_ID" ManualMerge to manually combine your local version with the GitHub version."
   echo "       Use DCGitPush "$ASSIGNMENT_ID" ForceLocal to replace the GitHub version with your local version."
   exit -1
 fi

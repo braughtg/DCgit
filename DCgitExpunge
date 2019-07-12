@@ -45,7 +45,7 @@ fi
 
 echo "Expunging the assignment..."
 
-echo -n "  Retype the assignment ID to confirm: "
+echo -n "  Retype the AssignmentID to confirm: "
 read CONFIRM
 if [[ $CONFIRM == $ASSIGNMENT_ID ]] ; then
   # Remove the repository from the student's local machine...
@@ -71,7 +71,8 @@ if [[ $CONFIRM == $ASSIGNMENT_ID ]] ; then
     echo "    "$ASSIGNMENT_ID" not removed from GitHub, "$STUDENT_GITHUB_ID" is not the owner."
   fi
 else
-  echo "  Expunge canceled.  Assignment ID not confirmed."
+  echo "  AssignmentID not confirmed."
+  echo "  Expunge canceled."
 fi
 
 echo "Done."
