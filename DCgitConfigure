@@ -26,7 +26,7 @@ do
   read ENTERED_STUDENT_GITHUB_ID
   VALID_USERNAME=$(checkIfUserExistsOnGitHub $ENTERED_STUDENT_GITHUB_ID)
   if ! $VALID_USERNAME ; then
-    echo "  "$ENTERED_STUDENT_GITHUB_ID is not a valid GitHub username."
+    echo "  "$ENTERED_STUDENT_GITHUB_ID" is not a valid GitHub username."
     echo "   Check the name and try again."
   fi
 done
@@ -49,7 +49,7 @@ do
   read ENTERED_INSTRUCTOR_GITHUB_ID
   VALID_USERNAME=$(checkIfUserExistsOnGitHub $ENTERED_INSTRUCTOR_GITHUB_ID)
   if ! $VALID_USERNAME ; then
-    echo "  "$ENTERED_STUDENT_GITHUB_ID is not a valid GitHub username."
+    echo "  "$ENTERED_INSTRUCTOR_GITHUB_ID" is not a valid GitHub username."
     echo "   Check the name and try again."
   fi
 done
