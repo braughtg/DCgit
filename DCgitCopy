@@ -40,7 +40,7 @@ STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID)
 if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
   echo "DCgitCopy must be run from within the "$COURSE_ID" directory."
   echo "Things to check:"
-  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitCopy?"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitCopy "$ASSIGNMENT_ID"?"
   exit -1
 fi
 
@@ -48,7 +48,7 @@ fi
 if [[ ! -d $ASSIGNMENT_ID ]] ; then
   echo "You do not have "$ASSIGNMENT_ID"."
   echo "Things to check:"
-  echo "  Try using DCgitPull to get the assignment first."
+  echo "  Try using DCgitPull "$ASSIGNMENT_ID" to get the assignment first."
   exit -1
 fi
 
@@ -56,8 +56,8 @@ fi
 if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) && ! $REPLACE ; then
   echo "It appears that you already have "$ASSIGNMENT_ID" in your GitHub."
   echo "Things to check:"
-  echo "  Did you mean to use DCgitPush?"
-  echo "  Use DCgitCopy Replace to replace your GitHub copy."
+  echo "  Did you mean to use DCgitPush "$ASSIGNMENT_ID"?"
+  echo "  Use DCgitCopy "$ASSIGNMENT_ID" Replace to replace your GitHub copy."
   exit -1
 fi
 
@@ -68,7 +68,7 @@ if ! $REPLACE ; then
   if [[ $GIT_OUT == "$NEW_ORIGIN" ]] ; then
     echo "It appears that you already have your own copy of "$ASSIGNMENT_ID"."
     echo "Things to check:"
-    echo "  Did you mean to use DCgitPush?"
+    echo "  Did you mean to use DCgitPush "$ASSIGNMENT_ID"?"
     exit -1
   fi
 fi
@@ -85,7 +85,8 @@ if $REPLACE ; then
   if $(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
     echo "    Deleted."
   else
-    echo "    Unable to delete "$ASSIGNMENT_ID" from GitHub. Try removing it manually."
+    echo "    Unable to delete "$ASSIGNMENT_ID" from GitHub."
+    echo "    Try removing it manually."
     exit -1
   fi
 fi

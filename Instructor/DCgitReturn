@@ -44,7 +44,7 @@ fi
 # Does the ASSIGNMENT_ID.submissions directory exist?
 if [[ ! -d $ASSIGNMENT_ID".submissions" ]] ; then
   echo "No submissions for "$ASSIGNMENT_ID"."
-  echo "Have you used DCgitCheck and DCgitCollect?"
+  echo "Have you used DCgitCheck "$ASSIGNMENT_ID" and DCgitCollect "$ASSIGNMENT_ID"?"
   exit -1
 fi
 
@@ -98,7 +98,7 @@ do
     GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID commit -m "$COMMIT_MESSAGE" 2>&1)
 
     # Push the the Graded branch to the origin...
-    echo "    Pushing the Graded branch to GitHub..."
+    echo "    Pushing the \"Graded\" branch to GitHub..."
     GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID push origin Graded --force 2>&1)
     if [[ $GIT_OUT == *"failed to push some refs"* ]] ; then
       # Undo the last commit to put things back the way we found them...
@@ -106,7 +106,7 @@ do
       # Unstage everything that was staged...
       git -C $DIR"/"$ASSIGNMENT_ID reset 2>&1 > /dev/null
 
-      echo "      Unable to push Graded branch got GitHub."
+      echo "      Unable to push \"Graded\" branch got GitHub."
       echo "      Were there conflicts? Try checking manually for more information."
       echo "      Skipping."
       continue
@@ -114,7 +114,7 @@ do
 
     GIT_OUT=$(git -C $DIR"/"$ASSIGNMENT_ID status 2>&1)
     if [[ $GIT_OUT != *"nothing to commit, working tree clean"* ]] ; then
-      echo "    There was a problem pushing the Graded branch to GitHub."
+      echo "    There was a problem pushing the \"Graded\" branch to GitHub."
       echo "    Try checking manually for more information."
       echo "    Skipping."
       continue

@@ -44,7 +44,7 @@ STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID)
 if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
   echo "DCgitPull must be run from within the "$COURSE_ID" directory."
   echo "Things to check:"
-  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitPull?"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitPull "$ASSIGNMENT_ID"?"
   exit -1
 fi
 
@@ -53,7 +53,7 @@ fi
 if ! $(repoAccessibleOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
   echo "You do not have access to "$ASSIGNMENT_ID" on GitHub."
   echo "Things to check:"
-  echo "  Make sure you or your partner has used DCgitBegin to start the assignment"
+  echo "  Make sure you or your partner has used DCgitBegin "$ASSIGNMENT_ID" to start the assignment"
   echo "  If your partner used DCgitBegin:"
   echo "    Make sure you have accepted your partner's invitation to collaborate on "$ASSIGNMENT_ID"."
   echo "      Wait a minute or so after accepting an invitation before trying again."
@@ -84,7 +84,8 @@ if [[ -d $ASSIGNMENT_ID ]] ; then
       GIT_OUT=$(git reset --hard origin/master 2>&1)
       GIT_OUT=$(git clean -fdx 2>&1)
     else
-      echo "    ForceRemote was not entered, canceling DCgitPull ForceRemote."
+      echo "    ForceRemote was not entered."
+      echo "    Canceling DCgitPull "$ASSIGNMENT_ID" ForceRemote."
       exit -1
     fi
   else
@@ -134,17 +135,17 @@ if [[ -d $ASSIGNMENT_ID ]] ; then
         GIT_OUT=$(git clean -f *.orig 2>&1)
         # Finish the commit...
         echo "    Committing the changes..."
-        COMMIT_MESSAGE=$(whoami)" used DCgitPull ManualMerge "$(date)"."
+        COMMIT_MESSAGE=$(whoami)" used DCgitPull "$ASSIGNMENT_ID" ManualMerge "$(date)"."
         GIT_OUT=$(git commit -m "$COMMIT_MESSAGE" 2>&1)
 
         echo "    Conflicts have been merged."
-        echo "    Be sure to use DCgitPush when you finish working to push the changes to GitHub."
+        echo "    Be sure to use DCgitPush "$ASSIGNMENT_ID" when you finish working to push the changes to GitHub."
       else
         echo "    There are no conflicts to be merged."
         GIT_OUT=$(git status 2>&1)
         if [[ $GIT_OUT == *"Your branch is ahead"* ]] ; then
           echo "    However, you have changes to the assignment that are not on GitHub."
-          echo "    Be sure to use DCgitPush when you finish working to push your changes to GitHub."
+          echo "    Be sure to use DCgitPush "$ASSIGNMENT_ID" when you finish working to push your changes to GitHub."
         fi
       fi
 
@@ -165,9 +166,9 @@ if [[ -d $ASSIGNMENT_ID ]] ; then
         echo "       You pushed changes from another machine to GitHub that you did not pull before editing."
         echo "       You did not resolve all conflicts during a manual merge."
         echo "    You can:"
-        echo "      Push your version to GitHub using DGgitPush ForceLocal"
-        echo "      Switch to the version on GitHub using DCgitPull ForceRemote"
-        echo "      Try to merge the versions manually using DCgitPull ManualMerge"
+        echo "      Push your version to GitHub using DGgitPush "$ASSIGNMENT_ID" ForceLocal"
+        echo "      Switch your version to the version on GitHub using DCgitPull "$ASSIGNMENT_ID" ForceRemote"
+        echo "      Try to merge the versions manually using DCgitPull "$ASSIGNMENT_ID" ManualMerge"
         exit -1
       elif [[ $GIT_OUT == *"Already up to date"* ]] ; then
         echo "    Local version already has all changes from GitHub."
@@ -180,7 +181,7 @@ if [[ -d $ASSIGNMENT_ID ]] ; then
       GIT_OUT=$(git status 2>&1)
       if [[ $GIT_OUT == *"Your branch is ahead"* ]] ; then
         echo "    However, you have changes to the assignment that are not on GitHub."
-        echo "    Be sure to use DCgitPush when you finish working to push your changes to GitHub."
+        echo "    Be sure to use DCgitPush "$ASSIGNMENT_ID" when you finish working to push your changes to GitHub."
       fi
     fi
   fi

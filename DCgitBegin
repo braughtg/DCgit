@@ -39,7 +39,7 @@ STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID)
 if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
   echo "DCgitBegin must be run from within the "$COURSE_ID" directory."
   echo "Things to check:"
-  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitBegin?"
+  echo "  Did you mean to cd "$COURSE_ID" and then use DCgitBegin "$ASSIGNMENT_ID"?"
   exit -1
 fi
 
@@ -47,7 +47,7 @@ fi
 if [[ -d $ASSIGNMENT_ID ]] ; then
   echo "You already have a directory for "$ASSIGNMENT_ID"."
   echo "Things to check:"
-  echo "  Did you mean to use DCgitPull?"
+  echo "  Did you mean to use DCgitPull "$ASSIGNMENT_ID"?"
   exit -1
 fi
 
@@ -55,7 +55,7 @@ fi
 if ! $(repoPublicOnGitHub $ASSIGNMENT_ID $GITHUB_COURSE_ORG) ; then
   echo $ASSIGNMENT_ID" was not found in the course "$GITHUB_COURSE_ORG"."
   echo "Things to check:"
-  echo "  Is the assignment name correct?"
+  echo "  Is the "$ASSIGNMENT_ID" the correct AssignmentID?"
   exit -1
 fi
 
@@ -63,12 +63,8 @@ fi
 if $(repoOwnedOnGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD) ; then
   echo $ASSIGNMENT_ID" already exists in your GitHub but not locally."
   echo "Things to check:"
-  echo "  To start the assignment over again:"
-  echo "    Use DCgitExpunge"
-  echo "    Or manually remove "$ASSIGNMENT_ID" from your GitHub account."
-  echo "  To get a local copy of "$ASSIGNMENT_ID":"
-  echo "    Copy the URL of "$ASSIGNMENT_ID" from your GitHub account."
-  echo "    git clone URL"
+  echo "  To start the assignment over again use DCgitExpunge "$ASSIGNMENT_ID"."
+  echo "  To get a local copy of the assignment use DCgitPull "$ASSIGNMENT_ID"."
   exit -1
 fi
 
@@ -77,7 +73,7 @@ if [[ $PARTNER_GITHUB_ID ]] ; then
   if ! $(checkIfUserExistsOnGitHub $PARTNER_GITHUB_ID) ; then
     echo $PARTNER_GITHUB_ID" is not a recognized GitHub user ID."
     echo "Thing to check:"
-    echo "  Is the GitHub ID of your partner correct?"
+    echo "  Is "$PARTNER_GITHUB_ID" the correct GitHub ID of your partner?"
     exit -1
   fi
 fi
@@ -138,8 +134,7 @@ if [[ GIT_OUT == *"remote: Repository not found."* ]] ; then
   SUCCESS=$(deleteRepoFromGitHub $ASSIGNMENT_ID $STUDENT_GITHUB_ID $STUDENT_GITHUB_PASSWORD)
   if ! $SUCCESS ; then
     echo "    Things to try:"
-    echo "      Use DCgitExpunge to remove the "$ASSIGNMENT_ID" repository and try DCgitBegin again."
-    echo "      Manually remove the "$ASSIGNMENT_ID" repository from your GitHub and try again."
+    echo "      Use DCgitExpunge "$ASSIGNMENT_ID" and then try DCgitBegin "$ASSIGNMENT_ID" again."
   fi
   exit -1
 fi
@@ -161,5 +156,5 @@ GIT_OUT=$(git clone $GIT_URL 2>&1)
 echo "Done."
 echo "The assignment "$ASSIGNMENT_ID" is now available in your GitHub and on your local machine."
 echo "  Complete the assignment using the files in the "$ASSIGNMENT_ID" directory."
-echo "  Use DCgitPush at the end of each session to copy your work to GitHub."
-echo "  Use DCgitPull at the start of each session to retrieve your most recent work."
+echo "  Use DCgitPush "$ASSIGNMENT_ID" at the end of each session to copy your work to GitHub."
+echo "  Use DCgitPull "$ASSIGNMENT_ID" at the start of each session to retrieve your most recent work."

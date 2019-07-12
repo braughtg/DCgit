@@ -32,8 +32,14 @@ DCgit is a set of scripts for managing assignments as GitHub repositories in an 
    1. Log into GitHub
    1. Open the assignment repository
    1. Click the "Branch: master" button
-   1. Choose "Graded"
-   1. Files will contain instructor comments and grades.
+   1. Choose "Graded" to see files with instructor comments and grades.
+   1. Choose "master" to return to ungraded files.
+   1. To get live files you can work with:
+      1. Open a terminal
+      1. `cd CourseName`
+      1. `./DCgitPull AssignmentID`
+      1. `git checkout Graded` to access files with instructor comments and grades.
+      1. `git checkout master` to return to ungraded files.
 1. To copy from partner when assignment is complete:
    1. Open a terminal
    1. `cd CourseName`
