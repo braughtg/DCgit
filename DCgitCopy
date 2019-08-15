@@ -37,7 +37,8 @@ SCRIPT_DIR=$(dirname $0)
 STUDENT_GITHUB_PASSWORD=$(getGitHubPassword $STUDENT_GITHUB_ID)
 
 # Are we running inside of the course directory?
-if [[ "${PWD##*/}" != "$COURSE_ID" ]] ; then
+# Do case insensitive match to accomodate git for windows.
+if [[ $(grep -ix ${PWD##*/} <<< $COURSE_ID) ]]; then
   echo "DCgitCopy must be run from within the "$COURSE_ID" directory."
   echo "Things to check:"
   echo "  Did you mean to cd "$COURSE_ID" and then use DCgitCopy "$ASSIGNMENT_ID"?"
