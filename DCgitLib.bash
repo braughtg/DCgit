@@ -18,7 +18,7 @@ function getGitHubPassword {
   # otherwise output will appear twice.
   local GITHUB_ID=$1
   local PASSWORD_SET=false
-  local GGITHUB_PASSWORD=""
+  local GITHUB_PASSWORD=""
 
   # Try to retrieve the password from the git credential helper.
   local GIT_CREDENTIAL_HELPER=$(git config --global credential.helper)
